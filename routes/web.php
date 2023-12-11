@@ -39,3 +39,5 @@ require __DIR__.'/auth.php';
 
 
 Route::view('/home','layouts.app');
+Route::view('/workspaces','workspaces')->name('workspaces');
+Route::view('/workspaces/details','workspaceDetails')->name('workspaces.details');
