@@ -146,3 +146,11 @@
 .workspace-tabs .nav-tabs .nav-link.active {
   border-bottom-color: #696cff;
 }
+
+.btn-simple:hover {
+  background-color: #e8e8f1 !important;
+}
+
+ul.dropdown-menu li .bx {
+  margin-top: -2px;
+}

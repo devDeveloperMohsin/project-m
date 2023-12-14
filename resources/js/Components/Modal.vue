@@ -1,98 +1,91 @@
 <script setup>
-import { computed, onMounted, onUnmounted, watch } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
 
+// Props
 const props = defineProps({
-    show: {
-        type: Boolean,
-        default: false,
-    },
-    maxWidth: {
-        type: String,
-        default: '2xl',
-    },
-    closeable: {
-        type: Boolean,
-        default: true,
-    },
+	id: {
+		type: String,
+		required: true,
+	},
+	show: {
+		type: Boolean,
+		default: false,
+	},
+	closeOnEscape: {
+		type: Boolean,
+		default: true,
+	},
 });
+// End Props
 
-const emit = defineEmits(['close']);
+let modal;
+const emit = defineEmits(['closed']);
 
+// Watchers
 watch(
-    () => props.show,
-    () => {
-        if (props.show) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = null;
-        }
-    }
+	() => props.show,
+	() => {
+		if (props.show) {
+			showModal();
+		} else {
+			hideModal();
+		}
+	}
 );
+// End Watchers
 
-const close = () => {
-    if (props.closeable) {
-        emit('close');
-    }
+// Methods
+const showModal = () => {
+	modal.show();
 };
 
-const closeOnEscape = (e) => {
-    if (e.key === 'Escape' && props.show) {
-        close();
-    }
+const hideModal = () => {
+	modal.hide();
 };
+// End Methods
 
-onMounted(() => document.addEventListener('keydown', closeOnEscape));
+// Lifecycle hooks
+onMounted(() => {
+	let modalDom = document.getElementById('modal-' + props.id);
+	modal = new bootstrap.Modal(modalDom, {
+		keyboard: props.closeOnEscape,
+	});
+
+	modalDom.addEventListener('hide.bs.modal', function (event) {
+		emit('closed');
+	})
+});
 
 onUnmounted(() => {
-    document.removeEventListener('keydown', closeOnEscape);
-    document.body.style.overflow = null;
-});
+	if (modal) {
+		modal.dispose();
+	}
+})
+// End Lifecycle hooks
 
-const maxWidthClass = computed(() => {
-    return {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
-    }[props.maxWidth];
-});
 </script>
 
 <template>
-    <Teleport to="body">
-        <Transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" scroll-region>
-                <Transition
-                    enter-active-class="ease-out duration-300"
-                    enter-from-class="opacity-0"
-                    enter-to-class="opacity-100"
-                    leave-active-class="ease-in duration-200"
-                    leave-from-class="opacity-100"
-                    leave-to-class="opacity-0"
-                >
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-gray-500 opacity-75" />
-                    </div>
-                </Transition>
+	<div class="modal fade" :id="'modal-' + props.id" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel1">
+						<slot name="title"></slot>
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<slot></slot>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+						Close
+					</button>
 
-                <Transition
-                    enter-active-class="ease-out duration-300"
-                    enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    enter-to-class="opacity-100 translate-y-0 sm:scale-100"
-                    leave-active-class="ease-in duration-200"
-                    leave-from-class="opacity-100 translate-y-0 sm:scale-100"
-                    leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                    <div
-                        v-show="show"
-                        class="mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass"
-                    >
-                        <slot v-if="show" />
-                    </div>
-                </Transition>
-            </div>
-        </Transition>
-    </Teleport>
+					<slot name="action-btns"></slot>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>

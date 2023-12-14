@@ -39,5 +39,7 @@ require __DIR__.'/auth.php';
 
 
 Route::view('/home','layouts.app');
+Route::view('/dashboard','dashboard')->name('dashboard');
 Route::view('/workspaces','workspaces')->name('workspaces');
 Route::view('/workspaces/details','workspaceDetails')->name('workspaces.details');
+Route::view('/project/details', 'projectDetails')->name('project.details');
