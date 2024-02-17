@@ -1,0 +1,320 @@
+/*
+* demo.css
+* File include item demo only specific css only
+******************************************************************************/
+
+.menu .app-brand.demo {
+  height: 64px;
+  margin-top: 12px;
+}
+
+.app-brand-logo.demo svg {
+  width: 22px;
+  height: 38px;
+}
+
+.app-brand-text.demo {
+  font-size: 1.75rem;
+  letter-spacing: -0.5px;
+  text-transform: lowercase;
+}
+
+/* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
+/* Detached navbar */
+.layout-navbar-fixed .layout-wrapper:not(.layout-horizontal):not(.layout-without-menu) .layout-page {
+  padding-top: 76px !important;
+}
+
+/* Default navbar */
+.layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
+  padding-top: 64px !important;
+}
+
+/* Navbar page z-index issue solution */
+.content-wrapper .navbar {
+  z-index: auto;
+}
+
+/*
+* Content
+******************************************************************************/
+
+.demo-blocks>* {
+  display: block !important;
+}
+
+.demo-inline-spacing>* {
+  margin: 1rem 0.375rem 0 0 !important;
+}
+
+/* ? .demo-vertical-spacing class is used to have vertical margins between elements. To remove margin-top from the first-child, use .demo-only-element class with .demo-vertical-spacing class. For example, we have used this class in forms-input-groups.html file. */
+.demo-vertical-spacing>* {
+  margin-top: 1rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-lg>* {
+  margin-top: 1.875rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-lg.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-xl>* {
+  margin-top: 5rem !important;
+  margin-bottom: 0 !important;
+}
+
+.demo-vertical-spacing-xl.demo-only-element> :first-child {
+  margin-top: 0 !important;
+}
+
+.rtl-only {
+  display: none !important;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+[dir='rtl'] .rtl-only {
+  display: block !important;
+}
+
+/*
+* Layout demo
+******************************************************************************/
+
+.layout-demo-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.layout-demo-placeholder img {
+  width: 900px;
+}
+
+.layout-demo-info {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/*
+* Custom CSS
+******************************************************************************/
+.swal2-container.swal2-top-end.swal2-backdrop-show {
+  z-index: +9999;
+}
+
+.create-workspace-card {
+  display: block;
+}
+
+.create-workspace-card>div {
+  padding: 2.5rem;
+  border: 2px dotted #696cff;
+  background-color: #e7e7ff;
+}
+
+.workspace-card .workspace-card-img {
+  height: 105px;
+  width: 105px;
+  min-height: 105px;
+  min-width: 105px;
+}
+
+.workspace-card .workspace-card-img-bg {
+  background-color: #696cff;
+  height: 100%;
+}
+
+.workspace-cover-wrapper {
+  position: relative;
+}
+
+.workspace-cover-wrapper .edit-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.workspace-cover-wrapper .workspace-cover-img {
+  max-height: 250px;
+  width: 100%;
+  object-fit: cover
+}
+
+.workspace-tabs .nav-tabs .nav-link {
+  border-bottom: 4px solid #eceef1
+}
+
+.workspace-tabs .nav-tabs .nav-link.active {
+  border-bottom-color: #696cff;
+}
+
+.btn-simple:hover {
+  background-color: #e8e8f1 !important;
+}
+
+ul.dropdown-menu li .bx {
+  margin-top: -2px;
+}
+
+.no-shadow-tabs .tab-content {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.no-shadow-tabs.nav-align-top .nav-tabs .nav-item.nav-link {
+  border-radius: 0.375rem !important;
+}
+
+.no-shadow-tabs.nav-align-top .nav-tabs .nav-link.active {
+  box-shadow: none;
+  border: none;
+  background-color: #696cff;
+  color: #fff;
+}
+
+.comments {
+  display: flex;
+}
+
+.comments+.comments {
+  margin-top: 30px;
+}
+
+.comments .user-icon a {
+  border-radius: 50%;
+  display: block;
+  border: 2px solid #eee;
+  padding: 2px;
+}
+
+.comments .user-icon img {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.comments .comment-body {
+  margin-left: 10px;
+  padding-top: 5px;
+}
+
+.comments .comment-title span {
+  display: inline-block;
+  margin: 0px 10px;
+}
+
+.history.comments+.comments {
+  margin-top: 0px;
+}
+
+.history.comments .user-icon img {
+  height: 30px;
+  width: 30px;
+}
+
+.history.comments .comment-body {
+  margin-left: 10px;
+  padding-top: 2px;
+}
+
+.home-cover-img {
+  position: relative;
+}
+
+.home-cover-img img {
+  width: 100%;
+  border: 1px solid #dfdfe9;
+  border-radius: 0.35rem;
+  transform: rotate(2deg);
+}
+
+.home-cover-img img.first {
+  transform: rotate(-1deg);
+  box-shadow: 10px 10px 9px 0px #0000001a;
+  animation: home_translate 5s linear infinite;
+}
+
+.home-cover-img img.second {
+  position: absolute;
+  top: -34px;
+  left: 44px;
+  z-index: -1;
+  opacity: 0.75;
+  animation: home_rotate 5s linear infinite;
+}
+
+.home-cover-img svg {
+  position: absolute;
+  left: -40px;
+  top: -10px;
+  z-index: -1;
+  width: 200px;
+}
+
+.home-top-svg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+@keyframes home_rotate {
+  0% {
+    transform: rotate(2deg);
+  }
+
+  50% {
+    transform: rotate(3deg);
+  }
+
+  100% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes home_translate {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.members-list {
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 0px !important;
+}
+
+.members-list:hover {
+  background-color: #f5f5f9;
+}
