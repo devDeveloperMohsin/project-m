@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BoardController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
@@ -53,6 +54,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/project/{id}/update', [ProjectController::class, 'update'])->name('project.update');
     Route::post('/project/{id}/star', [ProjectController::class, 'starToggle'])->name('project.starToggle');
     Route::delete('/project/{id}/revoke/{userId}/user', [ProjectController::class, 'revokeAccess'])->name('project.revokeAccess');
+
+    // Board Routes
+
+    // End Board Routes
+    Route::post('/board/store', [BoardController::class, 'store'])->name('board.store');
+    Route::put('/board/{id}/update', [BoardController::class, 'update'])->name('board.update');
+    Route::get('/project/{id}/boards-history', [BoardController::class, 'history'])->name('board.history');
+    Route::delete('/board/{id}/delete', [BoardController::class, 'destroy'])->name('board.delete');
     // End Project Routes
 
 });

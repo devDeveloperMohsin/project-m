@@ -34,6 +34,13 @@
 
       {{-- Project Actions --}}
       <div style="min-width: 150px" class="ms-auto">
+        {{-- Add Group Button --}}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBoardModal"
+          aria-controls="createBoardModal">
+          <span class="tf-icons bx bx-plus"></span>&nbsp; Add Board
+        </button>
+        {{-- End Add Group Button --}}
+
         {{-- Invite Button --}}
         <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#invitationOffCanvas"
           aria-controls="invitationOffCanvas">
@@ -50,6 +57,9 @@
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
                 data-bs-target="#projectInfoModal"><span class="bx bx-info-circle"></span> Details</a>
+            </li>
+            <li><a class="dropdown-item" href="{{ route('board.history', $project->id) }}"><span
+                  class="bx bx-info-circle"></span> Boards History</a>
             </li>
             <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
                 data-bs-target="#editModal"><span class="bx bx-edit-alt"></span> Edit</a></li>
@@ -164,53 +174,98 @@
     {{-- <div class="mb-5" id="project-board"></div> --}}
 
     <div class="project-details">
-      <div class="project-group">
-        <div class="d-flex  mb-3">
-          <h5 class="m-0">Group Title</h5>
-          <div class="ms-auto">
-            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-              data-bs-target="#addTaskModal">
-              <span class="tf-icons bx bx-plus"></span>&nbsp; Add Task
+      {{-- Project Board --}}
+      @forelse ($project->boards as $board)
+        <div class="project-group">
+          <div class="d-flex  mb-3">
+            <h5 class="m-0">{{ $board->name }}</h5>
+            <div class="ms-auto">
+              <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                data-bs-target="#addTaskModal">
+                <span class="tf-icons bx bx-plus"></span>&nbsp; Add Task
+              </button>
+              <button type="button" class="btn btn-sm btn-icon btn-outline-primary edit_board_btn"
+                data-board-name="{{ $board->name }}" data-board-sorting="{{ $board->sorting }}"
+                data-board-update-route="{{ route('board.update', $board->id) }}">
+                <span class="tf-icons bx bx-edit-alt"></span>
+              </button>
+            </div>
+          </div>
+
+          @if (is_countable($board->tasks) && count($board->tasks) > 0)
+            <div class="p-group-body">
+              <div class="card">
+                <div class="card-body">
+                  <table id="myTable" class="hover row-border order-column compact">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <td>Title</td>
+                        <td>Status</td>
+                        <td>Priority</td>
+                        <td>Due Date</td>
+                        <td>Type</td>
+                        <td>Assigned to</td>
+                        <td>Created at</td>
+                        <td>last updated</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for ($i = 0; $i < 10; $i++)
+                        <tr>
+                          <td></td>
+                          <td>Title</td>
+                          <td>Status</td>
+                          <td>Priority</td>
+                          <td>Due Date</td>
+                          <td>Type</td>
+                          <td>Assigned to</td>
+                          <td>Created at</td>
+                          <td>last updated</td>
+                        </tr>
+                      @endfor
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          @else
+            <div class="alert alert-primary">
+              <p>
+                <span class="bx bx-bell"></span>
+                <strong>No Data</strong>
+              </p>
+              Start adding tasks to this board by clicking the <a href="javascript:void(0)" data-bs-toggle="modal"
+                data-bs-target="#addTaskModal" class="text-decoration-underline fw-bold">Add Task</a> button
+            </div>
+          @endif
+
+        </div>
+      @empty
+        <div class="card mb-4">
+          <h5 class="card-header">
+            <span class="bx bx-bell"></span>
+            Create Your First Board!
+          </h5>
+          <div class="card-body">
+            <p class="card-text">
+              Congratulations on taking the first step to supercharge your productivity! Let's create your first board and
+              kickstart your journey to organized and efficient task management.
+            </p>
+            <p>
+              Hit the <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#createBoardModal"
+                aria-controls="createBoardModal">Create Board</a> button below and customize your board to match your
+              workflow. Get ready to experience a whole new level of collaboration and productivity!
+            </p>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createBoardModal"
+              aria-controls="createBoardModal">
+              Let's create the first board
             </button>
           </div>
         </div>
-        <div class="p-group-body">
-          <div class="card">
-            <div class="card-body">
-              <table id="myTable" class="hover row-border order-column compact">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <td>Title</td>
-                    <td>Status</td>
-                    <td>Priority</td>
-                    <td>Due Date</td>
-                    <td>Type</td>
-                    <td>Assigned to</td>
-                    <td>Created at</td>
-                    <td>last updated</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for ($i = 0; $i < 10; $i++)
-                    <tr>
-                      <td></td>
-                      <td>Title</td>
-                      <td>Status</td>
-                      <td>Priority</td>
-                      <td>Due Date</td>
-                      <td>Type</td>
-                      <td>Assigned to</td>
-                      <td>Created at</td>
-                      <td>last updated</td>
-                    </tr>
-                  @endfor
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+      @endforelse
+      {{-- End Project Board --}}
+
     </div>
 
     {{-- Project Info Modal --}}
@@ -609,6 +664,104 @@
     </div>
     {{-- End Edit Task Modal --}}
 
+    {{-- Create Board Modal --}}
+    <div class="modal fade" id="createBoardModal" data-bs-backdrop="static" tabindex="-1">
+      <div class="modal-dialog">
+        <form class="modal-content" action="{{ route('board.store') }}" method="POST" enctype="multipart/form-data">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="backDropModalTitle">Create Board</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col mb-3">
+                <input type="hidden" name="project_id" value="{{ $project->id }}">
+                <label for="board-name" class="form-label">Name</label>
+                <input type="text" name="name" value="{{ old('name') }}" id="board-name"
+                  class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name" required />
+                @error('name', 'board')
+                  <div class="form-text text-danger">
+                    {{ $message }}
+                  </div>
+                @enderror
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {{-- End Create Board Modal --}}
+
+    {{-- Edit Board Modal --}}
+    <div class="modal fade" id="editBoardModal" data-bs-backdrop="static" tabindex="-1">
+      <div class="modal-dialog">
+        <form class="modal-content" id="editBoardForm" action="" method="POST" enctype="multipart/form-data">
+          @csrf
+          @method('PUT')
+
+          <div class="modal-header">
+            <h5 class="modal-title" id="backDropModalTitle">Edit Board</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12 mb-3">
+                <label for="edit-board-name" class="form-label">Name</label>
+                <input type="text" name="name" value="{{ old('name') }}" id="edit-board-name"
+                  class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name" required />
+                @error('name', 'board')
+                  <div class="form-text text-danger">
+                    {{ $message }}
+                  </div>
+                @enderror
+              </div>
+              <div class="col-12 mb-3">
+                <label for="board-sorting" class="form-label">Sorting</label>
+                <input type="text" name="sorting" value="{{ old('sorting') }}" id="edit-board-sorting"
+                  class="form-control @error('sorting', 'board') is-invalid @enderror" placeholder="Enter Sorting"
+                  required />
+                @error('sorting', 'board')
+                  <div class="form-text text-danger">
+                    {{ $message }}
+                  </div>
+                @enderror
+              </div>
+              <div class="col-12">
+                <div class="form-check mt-3">
+                  <input class="form-check-input" type="checkbox" value="1" id="close-board" name="close">
+                  <label class="form-check-label" for="close-board"> Close the board </label>
+                </div>
+                @error('name', 'board')
+                  <div class="form-text text-danger">
+                    {{ $message }}
+                  </div>
+                @enderror
+                <div class="alert alert-secondary mt-3" role="alert">
+                  <span class="bx bx-bell"></span>
+                  Closed boards are not displayed in Project details page. But you can always check the boards in the
+                  Project's <a href="{{ route('board.history', $project->id) }}">Board History</a> Page
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {{-- End Edit Board Modal --}}
+
   </div>
 @endsection
 
@@ -660,9 +813,24 @@
       });
   </script>
 
-  {{-- <script>
+  <script>
     $(document).ready(function() {
-      $('#editTaskModal').modal('show');
+      // $('#editTaskModal').modal('show');
+
+      // Open Board Edit Modal
+      $(document).on('click', '.edit_board_btn', function(e) {
+        e.preventDefault();
+        var updateRoute = $(this).attr('data-board-update-route');
+        var boardName = $(this).attr('data-board-name');
+        var boardSorting = $(this).attr('data-board-sorting');
+
+        $('#editBoardForm').attr('action', updateRoute);
+        $('#edit-board-name').val(boardName);
+        $('#edit-board-sorting').val(boardSorting);
+
+        $('#editBoardModal').modal('show');
+      });
+      // End Open Board Edit Modal
     });
-  </script> --}}
+  </script>
 @endsection

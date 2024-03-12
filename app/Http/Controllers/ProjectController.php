@@ -76,7 +76,7 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        $project = Project::with('users', 'invites')->findOrFail($id);
+        $project = Project::with('users', 'invites', 'boards')->findOrFail($id);
         return view('projectDetails', compact('project'));
     }
 

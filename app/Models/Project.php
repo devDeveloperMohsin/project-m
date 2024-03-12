@@ -73,4 +73,9 @@ class Project extends Model
                 break;
         }
     }
+
+    public function boards()
+    {
+        return $this->hasMany(Board::class, 'project_id')->where('closed', 0)->orderBy('sorting')->latest();
+    }
 }
