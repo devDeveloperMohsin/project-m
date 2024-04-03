@@ -21,4 +21,8 @@ class Board extends Model
     public function project() {
         return $this->belongsTo(Project::class, 'project_id');
     }
+
+    public function tasks() {
+        return $this->hasMany(Task::class, 'board_id');
+    }
 }

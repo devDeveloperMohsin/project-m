@@ -4,6 +4,7 @@ use App\Http\Controllers\BoardController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,12 +57,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/project/{id}/revoke/{userId}/user', [ProjectController::class, 'revokeAccess'])->name('project.revokeAccess');
 
     // Board Routes
-
-    // End Board Routes
     Route::post('/board/store', [BoardController::class, 'store'])->name('board.store');
     Route::put('/board/{id}/update', [BoardController::class, 'update'])->name('board.update');
     Route::get('/project/{id}/boards-history', [BoardController::class, 'history'])->name('board.history');
     Route::delete('/board/{id}/delete', [BoardController::class, 'destroy'])->name('board.delete');
+    // End Board Routes
+
+    // Task Routes
+    Route::post('/task/store', [TaskController::class, 'store'])->name('task.store');
+    Route::get('/task/show', [TaskController::class, 'show'])->name('task.show');
+    // End Task Routes
+    
     // End Project Routes
 
 });
