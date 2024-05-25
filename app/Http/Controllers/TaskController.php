@@ -28,6 +28,23 @@ class TaskController extends Controller
         return back()->withSuccess('Task has been added');
     }
 
+    public function update(Request $request, $id)
+    {
+        $validData = $request->validateWithBag('task', [
+            'title' => ['required', 'string', 'max:400'],
+            'description' => ['nullable', 'present'],
+            'status' => ['required', 'string', 'max: 191'],
+            'priority' => ['required', 'string', 'max: 191'],
+            'type' => ['required', 'string', 'max: 191'],
+            'due_date' => ['required', 'string', 'max: 191'],
+        ]);
+
+        $task = Task::findOrFail($id);
+        $task->update($validData);
+
+        return back()->withSuccess('Task has been updated');
+    }
+
     public function show(Request $request)
     {
         $request->validate([
@@ -73,5 +90,12 @@ class TaskController extends Controller
         $comment->delete();
 
         return back()->withSuccess('Comment has been deleted');
+    }
+
+    public function destroy($id) {
+        $task = Task::findOrFail($id);
+        $task->delete();
+
+        return redirect()->route('project.show', $task->board->project->id)->withSuccess('Task has been deleted');
     }
 }

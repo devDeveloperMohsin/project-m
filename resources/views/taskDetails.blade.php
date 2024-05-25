@@ -49,23 +49,21 @@
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#projectInfoModal"><span class="bx bx-info-circle"></span> Details</a>
-            </li>
-            <li><a class="dropdown-item" href="{{ route('board.history', $project->id) }}"><span
-                  class="bx bx-info-circle"></span> Boards History</a>
-            </li>
-            <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
                 data-bs-target="#editModal"><span class="bx bx-edit-alt"></span> Edit</a></li>
-            <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas"
-                data-bs-target="#invitationOffCanvas"><span class="bx bx-user-plus"></span> Invite</a></li>
-            {{-- <li><a class="dropdown-item" href="javascript:void(0);"><span class="bx bx-user-check"></span> Permissions</a> --}}
             </li>
             <li>
               <hr class="dropdown-divider" />
             </li>
-            <li><a class="dropdown-item text-danger" href="javascript:void(0);">
-                <span class="bx bx-trash"></span> Delete
-              </a></li>
+            <li>
+              <form action="{{ route('task.delete', $task->id) }}" method="POST">
+                @csrf
+                @method('DELETE')
+
+                <button class="dropdown-item text-danger">
+                  <span class="bx bx-trash"></span> Delete
+                </button>
+              </form>
+            </li>
           </ul>
         </div>
         {{-- End Dropdown --}}
@@ -219,7 +217,8 @@
                         <div class="comment-title">
                           <a href="javascript:void(0)">{{ $comment->user->name }}</a>
                           <span>{{ $comment->created_at->diffForHumans() }}</span>
-                          <form action="{{ route('task.deleteComment', $comment->id) }}" method="POST" class="me-1 d-inline-block">
+                          <form action="{{ route('task.deleteComment', $comment->id) }}" method="POST"
+                            class="me-1 d-inline-block">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-icon btn-sm btn-simple">
@@ -236,7 +235,8 @@
                             <div class="demo-inline-spacing mt-3">
                               <div class="list-group">
                                 @foreach ($comment->getMedia('attachments') as $ca)
-                                  <a href="{{ $ca->getUrl() }}" target="_blank" class="list-group-item list-group-item-action">{{ $ca->name }}</a>
+                                  <a href="{{ $ca->getUrl() }}" target="_blank"
+                                    class="list-group-item list-group-item-action">{{ $ca->name }}</a>
                                 @endforeach
                               </div>
                             </div>
@@ -257,74 +257,25 @@
     {{-- End Task Details --}}
     {{-- End Page Code --}}
 
-    {{-- Edit Modal --}}
-    <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1">
-      <div class="modal-dialog">
-        <form class="modal-content" action="{{ route('project.update', $project->id) }}" method="POST"
-          enctype="multipart/form-data">
-          @csrf
-          @method('PUT')
-          <div class="modal-header">
-            <h5 class="modal-title" id="backDropModalTitle">Edit Project</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col mb-3">
-                <label for="project-name" class="form-label">Name</label>
-                <input type="text" name="name" value="{{ old('name', $project->name) }}" id="project-name"
-                  class="form-control @error('name', 'project') is-invalid @enderror" placeholder="Enter Name"
-                  required />
-                @error('name', 'project')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <label for="project-description" class="form-label">Description</label>
-                <textarea name="description" id="project-description"
-                  class="form-control @error('description', 'project') is-invalid @enderror" rows="5">{{ old('description', $project->description) }}</textarea>
-                @error('description', 'project')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    {{-- End Edit Modal --}}
-
-    {{-- Create Task Modal --}}
-    <div class="modal fade" id="addTaskModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    {{-- Edit Task Modal --}}
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="add-task-modal-title">Add Task</h5>
+            <h5 class="modal-title">Edit Task</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
-          <form action="{{ route('task.store') }}" method="POST">
+          <form action="{{ route('task.update', $task->id) }}" method="POST">
             @csrf
-            <input type="hidden" name="board_id" id="add-task-board-id">
+            @method('PUT')
             <div class="modal-body">
               <div class="row">
                 <div class="col mb-3">
                   <label for="task-title" class="form-label">Title</label>
                   <input type="text" id="task-title"
                     class="form-control @error('title', 'task') is-invalid @enderror" placeholder="Write a task title"
-                    name="title" value="{{ old('title') }}" />
+                    name="title" value="{{ old('title', $task->title) }}" />
                   @error('title', 'task')
                     <div class="form-text text-danger">
                       {{ $message }}
@@ -335,7 +286,7 @@
               <div class="row">
                 <div class="col mb-3">
                   <label class="form-label">Description</label>
-                  <textarea id="editor" name="description">{{ old('description') }}</textarea>
+                  <textarea id="editor" name="description">{{ old('description', $task->description) }}</textarea>
                   @error('description', 'task')
                     <div class="form-text text-danger">
                       {{ $message }}
@@ -349,7 +300,8 @@
                   <select class="form-select @error('status', 'task') is-invalid @enderror" id="status-select"
                     aria-label="select task status" name="status">
                     @foreach ($taskStatuses as $status)
-                      <option value="{{ $status }}" class="text-capitalize">{{ $status }}</option>
+                      <option value="{{ $status }}" class="text-capitalize" @selected($task->status == $status)>
+                        {{ $status }}</option>
                     @endforeach
                   </select>
                   @error('status', 'task')
@@ -363,7 +315,8 @@
                   <select class="form-select @error('priority', 'task') is-invalid @enderror" id="priority-select"
                     aria-label="select task priority" name="priority">
                     @foreach ($taskPriorities as $priority)
-                      <option value="{{ $priority }}" class="text-capitalize">{{ $priority }}</option>
+                      <option value="{{ $priority }}" class="text-capitalize" @selected($task->priority == $priority)>
+                        {{ $priority }}</option>
                     @endforeach
                   </select>
                   @error('priority', 'task')
@@ -379,7 +332,7 @@
                   <select class="form-select @error('type', 'task') is-invalid @enderror" id="task-type"
                     aria-label="select task type" name="type">
                     @foreach ($taskTypes as $type)
-                      <option value="{{ $type }}">{{ $type }}</option>
+                      <option value="{{ $type }}" @selected($task->type == $type)>{{ $type }}</option>
                     @endforeach
                   </select>
                   @error('type', 'task')
@@ -391,7 +344,7 @@
                 <div class="col mb-3">
                   <label for="due-date" class="form-label">Due Date</label>
                   <input class="form-control @error('due_date', 'task') is-invalid @enderror" type="date"
-                    value="{{ old('due_date') }}" id="due-date" name="due_date" />
+                    value="{{ old('due_date', $task->due_date->format('Y-m-d')) }}" name="due_date" />
                   @error('due_date', 'task')
                     <div class="form-text text-danger">
                       {{ $message }}
@@ -446,7 +399,6 @@
 
   <script>
     $(document).ready(function() {
-      // $('#editTaskModal').modal('show');
 
       // Open Board Edit Modal
       $(document).on('click', '.edit_board_btn', function(e) {

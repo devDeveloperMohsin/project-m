@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('task_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('task_id')->cascadeOnUpdate();
+            $table->foreignId('user_id')->cascadeOnUpdate();
             $table->text('comment')->nullable();
             $table->timestamps();
         });
