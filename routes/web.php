@@ -66,6 +66,8 @@ Route::middleware('auth')->group(function () {
     // Task Routes
     Route::post('/task/store', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/show', [TaskController::class, 'show'])->name('task.show');
+    Route::post('/task/comment/store', [TaskController::class, 'storeComment'])->name('task.storeComment');
+    Route::delete('/task/comment/{id}/delete', [TaskController::class, 'destroyComment'])->name('task.deleteComment');
     // End Task Routes
     
     // End Project Routes

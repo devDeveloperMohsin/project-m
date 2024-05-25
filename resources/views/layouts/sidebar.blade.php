@@ -109,7 +109,7 @@
 
     @forelse ($markedProjects as $p)
       <li
-        class="menu-item {{ Route::currentRouteName() == 'project.show' && $w->id == request('id') ? 'active' : '' }}">
+        class="menu-item {{ Route::currentRouteName() == 'project.show' && $p->id == request('id') ? 'active' : '' }}">
         <a href="{{ route('project.show', $p->id) }}" class="menu-link">
           <i class="menu-icon tf-icons bx bx-server"></i>
           <div data-i18n="Documentation">{{ $p->name }}</div>

@@ -673,16 +673,17 @@
         let data = table.row(this).data();
         let taskId = table.row(this).id();
         taskId = parseInt(taskId.match(/\d+/)[0]);
-        $.ajax({
-          url: '{{ route('task.show') }}',
-          data: {
-            id: taskId,
-          },
-          success: function(result) {
-            $("#edit-task-content").html(result);
-            $('#editTaskModal').modal('show');
-          }
-        });
+        window.location.href = '{{ route('task.show') }}?id='+taskId;
+        // $.ajax({
+        //   url: '{{ route('task.show') }}',
+        //   data: {
+        //     id: taskId,
+        //   },
+        //   success: function(result) {
+        //     $("#edit-task-content").html(result);
+        //     $('#editTaskModal').modal('show');
+        //   }
+        // });
       });
 
       table.on('row-reorder', function(e, diff, edit) {

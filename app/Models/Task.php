@@ -15,7 +15,14 @@ class Task extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'board_id', 'title', 'description', 'status', 'priority', 'type', 'due_date', 'sorting',
+        'board_id',
+        'title',
+        'description',
+        'status',
+        'priority',
+        'type',
+        'due_date',
+        'sorting',
     ];
 
     /**
@@ -27,7 +34,13 @@ class Task extends Model
         'due_date' => 'datetime',
     ];
 
-    public function board() {
+    public function board()
+    {
         return $this->belongsTo(Board::class, 'board_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(TaskComment::class, 'task_id');
     }
 }
