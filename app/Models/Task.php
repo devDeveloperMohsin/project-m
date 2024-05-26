@@ -9,6 +9,10 @@ class Task extends Model
 {
     use HasFactory;
 
+    // Project Roles
+    const ROLE_ADMIN = 'task_admin';
+    const ROLE_MEMBER = 'task_member';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -42,5 +46,10 @@ class Task extends Model
     public function comments()
     {
         return $this->hasMany(TaskComment::class, 'task_id');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'task_users', 'task_id', 'user_id')->withPivot('role')->withTimestamps();
     }
 }

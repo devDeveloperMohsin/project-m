@@ -131,7 +131,14 @@
                 <div class="row">
                   <div class="col mb-3">
                     <label for="assigned-to" class="form-label">Assigned To</label>
-                    <p>Name Here</p>
+                    <p>
+                      @foreach ($task->users as $u)
+                        {{ $u->name }}
+                        @if (!$loop->last)
+                          ,
+                        @endif
+                      @endforeach
+                    </p>
                   </div>
                 </div>
               </div>
@@ -265,7 +272,13 @@
                   class="list-group-item list-group-item-action d-flex justify-content-between">
                   <div class="li-wrapper d-flex justify-content-start align-items-center" bis_skin_checked="1">
                     <div class="avatar avatar-sm me-3" bis_skin_checked="1">
-                      <span class="avatar-initial rounded-circle bg-label-success">M</span>
+                      @foreach ($t->users as $u)
+                        <img
+                          src="{{ !empty($u->getFirstMediaUrl()) ? $u->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) }}"
+                          alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30"
+                          width="30" />
+                      @endforeach
+
                     </div>
                     <div class="list-content" bis_skin_checked="1">
                       <h6 class="mb-1">{{ $t->title }}</h6>
@@ -387,7 +400,7 @@
                 <div class="col mb-3">
                   <label for="assigned-to" class="form-label">Assigned To</label>
                   <select class="form-select @error('task_user', 'task') is-invalid @enderror" id="assigned-to"
-                    aria-label="assign task" name="task_user">
+                    aria-label="assign task" name="assigned_to">
                     @foreach ($project->users as $user)
                       <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach

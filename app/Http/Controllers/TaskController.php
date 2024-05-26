@@ -21,10 +21,14 @@ class TaskController extends Controller
             'priority' => ['required', 'string', 'max: 191'],
             'type' => ['required', 'string', 'max: 191'],
             'due_date' => ['required', 'string', 'max: 191'],
+            'assigned_to' => ['required', 'integer', 'min:0', 'exists:users,id'],
         ]);
 
-        Task::create($validData);
+        $task = Task::create($validData);
 
+        // Assign User
+        $task->users()->attach($validData['assigned_to'], ['role' => Task::ROLE_MEMBER]);
+        
         return back()->withSuccess('Task has been added');
     }
 
@@ -37,10 +41,15 @@ class TaskController extends Controller
             'priority' => ['required', 'string', 'max: 191'],
             'type' => ['required', 'string', 'max: 191'],
             'due_date' => ['required', 'string', 'max: 191'],
+            'assigned_to' => ['required', 'integer', 'min:0', 'exists:users,id'],
         ]);
 
         $task = Task::findOrFail($id);
         $task->update($validData);
+
+        // dd($task->getChanges()); 
+        // Assign User
+        $task->users()->sync([$validData['assigned_to'] => ['role' => Task::ROLE_MEMBER]]);
 
         return back()->withSuccess('Task has been updated');
     }
@@ -51,7 +60,7 @@ class TaskController extends Controller
             'id' => ['required', 'integer', 'min:1'],
         ]);
 
-        $task = Task::findOrFail($request->get('id'));
+        $task = Task::with('users', 'board.tasks', 'board.tasks.users')->findOrFail($request->get('id'));
         $project = $task->board->project;
         $comments = TaskComment::with('user')->where('task_id', $task->id)->latest()->get();
         return view('taskDetails', compact('task', 'project', 'comments'));

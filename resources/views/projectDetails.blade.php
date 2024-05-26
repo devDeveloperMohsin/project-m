@@ -502,7 +502,7 @@
                 <div class="col mb-3">
                   <label for="assigned-to" class="form-label">Assigned To</label>
                   <select class="form-select @error('task_user', 'task') is-invalid @enderror" id="assigned-to"
-                    aria-label="assign task" name="task_user">
+                    aria-label="assign task" name="assigned_to">
                     @foreach ($project->users as $user)
                       <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach

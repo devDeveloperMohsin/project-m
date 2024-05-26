@@ -32,7 +32,7 @@ class ProjectController extends Controller
 
         $project = Project::create($validData);
 
-        // Make the user who is create the workspace a Workspace Admin
+        // Make the user who created the Project a Project Admin
         $project->users()->attach(Auth::id(), ['role' => Project::ROLE_ADMIN]);
 
         return back()->withSuccess('Project has been created');
