@@ -73,136 +73,109 @@
     {{-- End Project Header --}}
 
     {{-- Page Code --}}
-    {{-- Task Details --}}
-    <div>
-      <div class="">
-        <h5>{{ $task->board->project->name }} - Task {{ $task->id }}
-          <button style="margin-top: -6px" class="btn btn-icon btn-sm btn-simple">
-            <span class="text-primary bx bx-link"></span>
-          </button>
-        </h5>
 
-        <div class="row">
-          {{-- Left --}}
-          <div class="col-md-8 col-lg-7">
-            <div class="row">
-              <div class="col mb-3">
-                <label for="edit-task-title" class="form-label">Title</label>
-                <p>{{ $task->title }}</p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label class="form-label">Description</label>
-                <div>{!! $task->description !!}</div>
+    <h5 class="mt-3">{{ $task->board->project->name }} - Task {{ $task->id }}
+      <button style="margin-top: -6px" class="btn btn-icon btn-sm btn-simple">
+        <span class="text-primary bx bx-link"></span>
+      </button>
+    </h5>
 
-              </div>
-            </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header" bis_skin_checked="1">
+            <h5 class="card-tile mb-0">Task Details</h5>
           </div>
-          {{-- End Left --}}
-
-          {{-- Right --}}
-          <div class="col-md-4 col-lg-5">
-            <div class="row g-2">
-              <div class="col mb-3">
-                <label for="edit-status-select" class="form-label">Select Status</label>
-                <p>{{ $task->status }}</p>
-              </div>
-              <div class="col mb-3">
-                <label for="edit-priority-select" class="form-label">Select Priority</label>
-                <p>{{ $task->priority }}</p>
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col mb-3">
-                <label for="edit-task-type" class="form-label">Task Type</label>
-                <p>{{ $task->type }}</p>
-              </div>
-              <div class="col mb-3">
-                <label for="edit-due-date" class="form-label">Due Date</label>
-                <p>{{ $task->due_date->format('Y-m-d') }}</p>
-              </div>
-            </div>
+          <div class="card-body">
             <div class="row">
-              <div class="col mb-3">
-                <label for="assigned-to" class="form-label">Assigned To</label>
-                <p>Name Here</p>
-              </div>
-            </div>
-          </div>
-          {{-- End Right --}}
-        </div>
+              {{-- Left --}}
+              <div class="col-md-8 col-lg-7">
+                <div class="row">
+                  <div class="col mb-3">
+                    <label for="edit-task-title" class="form-label">Title</label>
+                    <p>{{ $task->title }}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col mb-3">
+                    <label class="form-label">Description</label>
+                    <div>{!! $task->description !!}</div>
 
-        <div class="clearfix"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          {{-- Tabs --}}
-          <div class="nav-align-top mb-4 no-shadow-tabs">
-
-            <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-item">
-                <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
-                  data-bs-target="#navs-justified-messages" aria-controls="navs-justified-messages" aria-selected="false">
-                  <i class="tf-icons bx bx-message-square"></i> Messages
-                  <span class="badge rounded-pill badge-center h-px-20 w-px-20 bg-label-dark">3</span>
-                </button>
-              </li>
-              <li class="nav-item">
-                <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
-                  data-bs-target="#navs-justified-home" aria-controls="navs-justified-home" aria-selected="true">
-                  <i class="tf-icons bx bx-home"></i> History
-                </button>
-              </li>
-            </ul>
-
-            <div class="tab-content">
-              {{-- History --}}
-              <div class="tab-pane fade" id="navs-justified-home" role="tabpanel">
-                <div>
-                  @for ($i = 0; $i < 10; $i++)
-                    <div class="comments history">
-                      <div class="user-icon">
-                        <a href="">
-                          <img src="https://ui-avatars.com/api/?name=Mohsin+Ali" alt="">
-                        </a>
-                      </div>
-                      <div class="comment-body">
-                        <div class="comment-title">
-                          <a href="">Mohsin Ali</a>
-                          <span>1 day ago</span>
-                        </div>
-                        <p>
-                          Updated status ---->> Pending
-                        </p>
-                      </div>
-                    </div>
-                  @endfor
+                  </div>
                 </div>
               </div>
-              {{-- End History --}}
+              {{-- End Left --}}
 
-              {{-- Comments/Discussions --}}
-              <div class="tab-pane fade show active" id="navs-justified-messages" role="tabpanel">
-                <form action="{{ route('task.storeComment') }}" method="post" enctype="multipart/form-data">
-                  @csrf
-                  <input type="hidden" name="task_id" value="{{ $task->id }}">
-                  <div class="mb-3">
-                    <label class="form-label">Write a comment message</label>
-                    <textarea class="form-control" name="comment" aria-label="Add comment" aria-describedby="task's comment box">{{ old('comment') }}</textarea>
+              {{-- Right --}}
+              <div class="col-md-4 col-lg-5">
+                <div class="row g-2">
+                  <div class="col mb-3">
+                    <label for="edit-status-select" class="form-label">Select Status</label>
+                    <p>{{ $task->status }}</p>
                   </div>
-                  <div class="mb-3">
-                    <input class="form-control" type="file" name="attachments[]" multiple />
+                  <div class="col mb-3">
+                    <label for="edit-priority-select" class="form-label">Select Priority</label>
+                    <p>{{ $task->priority }}</p>
                   </div>
+                </div>
+                <div class="row g-2">
+                  <div class="col mb-3">
+                    <label for="edit-task-type" class="form-label">Task Type</label>
+                    <p>{{ $task->type }}</p>
+                  </div>
+                  <div class="col mb-3">
+                    <label for="edit-due-date" class="form-label">Due Date</label>
+                    <p>{{ $task->due_date->format('Y-m-d') }}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col mb-3">
+                    <label for="assigned-to" class="form-label">Assigned To</label>
+                    <p>Name Here</p>
+                  </div>
+                </div>
+              </div>
+              {{-- End Right --}}
+            </div>
 
-                  <button class="btn btn-sm btn-primary">Add comment</button>
-                </form>
+            <div class="clearfix"></div>
+          </div>
+        </div>
 
+        <div class="nav-align-top mb-4" bis_skin_checked="1">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="true">
+                <i class="tf-icons bx bx-message-square"></i> Messages
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navs-top-profile" aria-controls="navs-top-profile" aria-selected="false" tabindex="-1">
+                <i class="tf-icons bx bx-home"></i> History
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content" bis_skin_checked="1">
+            {{-- Messages / Comments --}}
+            <div class="tab-pane fade active show" id="navs-top-home" role="tabpanel" bis_skin_checked="1">
+              <form action="{{ route('task.storeComment') }}" method="post" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="task_id" value="{{ $task->id }}">
+                <div class="mb-3">
+                  <label class="form-label">Write a comment message</label>
+                  <textarea class="form-control" name="comment" aria-label="Add comment" aria-describedby="task's comment box">{{ old('comment') }}</textarea>
+                </div>
+                <div class="mb-3">
+                  <input class="form-control" type="file" name="attachments[]" multiple />
+                </div>
 
-                <hr>
+                <button class="btn btn-sm btn-primary">Add comment</button>
+              </form>
 
-                <div>
+              @if (is_countable($comments) && count($comments) > 0)
+                <div class="mt-5">
                   @foreach ($comments as $comment)
                     <div class="comments">
                       <div class="user-icon">
@@ -246,15 +219,73 @@
                     </div>
                   @endforeach
                 </div>
-              </div>
-              {{-- End Comments Discussions --}}
+              @endif
+
             </div>
+            {{-- End Messages Comments --}}
+
+            {{-- History --}}
+            <div class="tab-pane fade" id="navs-top-profile" role="tabpanel" bis_skin_checked="1">
+              <div>
+                @for ($i = 0; $i < 10; $i++)
+                  <div class="comments history">
+                    <div class="user-icon">
+                      <a href="">
+                        <img src="https://ui-avatars.com/api/?name=Mohsin+Ali" alt="">
+                      </a>
+                    </div>
+                    <div class="comment-body">
+                      <div class="comment-title">
+                        <a href="">Mohsin Ali</a>
+                        <span>1 day ago</span>
+                      </div>
+                      <p>
+                        Updated status ---->> Pending
+                      </p>
+                    </div>
+                  </div>
+                @endfor
+              </div>
+            </div>
+            {{-- End History --}}
+
           </div>
-          {{-- End Tabs --}}
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-tile mb-0">{{ $task->board->name }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group" bis_skin_checked="1">
+              @forelse ($task->board->tasks as $t)
+                <a href="{{ route('task.show', ['id' => $t->id]) }}"
+                  class="list-group-item list-group-item-action d-flex justify-content-between">
+                  <div class="li-wrapper d-flex justify-content-start align-items-center" bis_skin_checked="1">
+                    <div class="avatar avatar-sm me-3" bis_skin_checked="1">
+                      <span class="avatar-initial rounded-circle bg-label-success">M</span>
+                    </div>
+                    <div class="list-content" bis_skin_checked="1">
+                      <h6 class="mb-1">{{ $t->title }}</h6>
+                      <small class="text-muted">{{ $t->status }}</small>
+                    </div>
+                  </div>
+                  <small>{{ $t->created_at->diffForHumans() }}</small>
+                </a>
+              @empty
+                <div class="alert alert-primary">No other tasks in this sprint</div>
+              @endforelse
+            </div>
+
+
+
+
+          </div>
         </div>
       </div>
     </div>
-    {{-- End Task Details --}}
     {{-- End Page Code --}}
 
     {{-- Edit Task Modal --}}
