@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\TaskComment;
+use App\Models\TaskHistory;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\File;
@@ -28,7 +30,10 @@ class TaskController extends Controller
 
         // Assign User
         $task->users()->attach($validData['assigned_to'], ['role' => Task::ROLE_MEMBER]);
-        
+
+        // Add History
+        $task->history()->create(['user_id' => Auth::id(), 'type' => TaskHistory::TYPE_TASK_CREATED, 'data' => json_encode(['title' => $task->title])]);
+
         return back()->withSuccess('Task has been added');
     }
 
@@ -47,9 +52,13 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
         $task->update($validData);
 
-        // dd($task->getChanges()); 
         // Assign User
         $task->users()->sync([$validData['assigned_to'] => ['role' => Task::ROLE_MEMBER]]);
+
+        // Add History
+        $changedData = $task->getChanges();
+        unset($changedData["updated_at"]);
+        $task->history()->create(['user_id' => Auth::id(), 'type' => TaskHistory::TYPE_TASK_Updated, 'data' => json_encode($changedData)]);
 
         return back()->withSuccess('Task has been updated');
     }
@@ -60,7 +69,7 @@ class TaskController extends Controller
             'id' => ['required', 'integer', 'min:1'],
         ]);
 
-        $task = Task::with('users', 'board.tasks', 'board.tasks.users')->findOrFail($request->get('id'));
+        $task = Task::with('users', 'board.tasks', 'board.tasks.users', 'history', 'history.user')->findOrFail($request->get('id'));
         $project = $task->board->project;
         $comments = TaskComment::with('user')->where('task_id', $task->id)->latest()->get();
         return view('taskDetails', compact('task', 'project', 'comments'));
@@ -90,18 +99,26 @@ class TaskController extends Controller
             }
         }
 
+        // Add History
+        $task->history()->create(['user_id' => Auth::id(), 'type' => TaskHistory::TYPE_COMMENTED, 'data' => json_encode(['comment' => $comment->comment])]);
+
         return back()->withSuccess('Comment has been added');
     }
 
     public function destroyComment($id)
     {
         $comment = TaskComment::where('user_id', Auth::id())->findOrFail($id);
-        $comment->delete();
 
+        // Add History
+        $comment->task->history()->create(['user_id' => Auth::id(), 'type' => TaskHistory::TYPE_DELETED_COMMENTED]);
+
+        // Delete
+        $comment->delete();
         return back()->withSuccess('Comment has been deleted');
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $task = Task::findOrFail($id);
         $task->delete();
 

@@ -188,7 +188,7 @@
                       <div class="user-icon">
                         <a href="javascript:void(0)">
                           <img
-                            src="{{ !empty($comment->user->getFirstMediaUrl()) ? $user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) }}"
+                            src="{{ !empty($comment->user->getFirstMediaUrl()) ? $comment->user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) }}"
                             alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30"
                             width="30" />
                         </a>
@@ -197,14 +197,16 @@
                         <div class="comment-title">
                           <a href="javascript:void(0)">{{ $comment->user->name }}</a>
                           <span>{{ $comment->created_at->diffForHumans() }}</span>
-                          <form action="{{ route('task.deleteComment', $comment->id) }}" method="POST"
-                            class="me-1 d-inline-block">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-icon btn-sm btn-simple">
-                              <span class="tf-icons bx bx-trash"></span>
-                            </button>
-                          </form>
+                          @if ($comment->user_id == Auth::id())
+                            <form action="{{ route('task.deleteComment', $comment->id) }}" method="POST"
+                              class="me-1 d-inline-block">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="btn btn-icon btn-sm btn-simple">
+                                <span class="tf-icons bx bx-trash"></span>
+                              </button>
+                            </form>
+                          @endif
                         </div>
                         <p>
                           {!! nl2br($comment->comment) !!}
@@ -234,24 +236,30 @@
             {{-- History --}}
             <div class="tab-pane fade" id="navs-top-profile" role="tabpanel" bis_skin_checked="1">
               <div>
-                @for ($i = 0; $i < 10; $i++)
-                  <div class="comments history">
+                @foreach ($task->history as $h)
+                  <div class="comments history mb-4">
                     <div class="user-icon">
-                      <a href="">
-                        <img src="https://ui-avatars.com/api/?name=Mohsin+Ali" alt="">
+                      <a href="javascript:void(0)">
+                        <img
+                          src="{{ !empty($h->user->getFirstMediaUrl()) ? $h->user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($h->user->name) }}"
+                          alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30"
+                          width="30" />
                       </a>
                     </div>
                     <div class="comment-body">
                       <div class="comment-title">
-                        <a href="">Mohsin Ali</a>
-                        <span>1 day ago</span>
+                        <a href="javacript:void(0)">{{ $h->user->name }}</a>
+                        <span>{{ $h->created_at->diffForHumans() }}</span>
                       </div>
-                      <p>
-                        Updated status ---->> Pending
+                      <p class="mb-1">
+                        {{ $h->type }}
                       </p>
+                      @foreach (json_decode($h->data) ?? [] as $key => $value)
+                        <p class="m-0 text-sm"> {{ $key }} >>> {{ $value }}</p>
+                      @endforeach
                     </div>
                   </div>
-                @endfor
+                @endforeach
               </div>
             </div>
             {{-- End History --}}

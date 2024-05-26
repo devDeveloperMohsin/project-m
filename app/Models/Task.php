@@ -48,6 +48,11 @@ class Task extends Model
         return $this->hasMany(TaskComment::class, 'task_id');
     }
 
+    public function history()
+    {
+        return $this->hasMany(TaskHistory::class, 'task_id')->latest();
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'task_users', 'task_id', 'user_id')->withPivot('role')->withTimestamps();
