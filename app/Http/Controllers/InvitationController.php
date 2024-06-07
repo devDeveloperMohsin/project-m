@@ -140,7 +140,7 @@ class InvitationController extends Controller
             $name = $user->name;
             $m = 'project ' . Str::title($model->name);
             Notification::send(User::findOrFail(1), new InvitationNotification($name, $m));
-            return to_route('workspaces.show', ['id' => $model->id]);
+            return to_route('project.show', ['id' => $model->id]);
         }
 
         return to_route('homepage');

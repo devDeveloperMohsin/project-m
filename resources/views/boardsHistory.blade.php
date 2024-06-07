@@ -13,7 +13,9 @@
       {{-- Project Details  --}}
       <div>
         <div class="d-flex mb-2">
-          <a href="{{ route('project.show', $project->id) }}"><h4 class="fw-bol m-0 me-2 text-primary">{{ $project->name }}</h4></a>
+          <a href="{{ route('project.show', $project->id) }}">
+            <h4 class="fw-bol m-0 me-2 text-primary">{{ $project->name }}</h4>
+          </a>
           <button type="button" class=" me-1 btn btn-icon btn-sm btn-simple" data-bs-toggle="modal"
             data-bs-target="#projectInfoModal">
             <span class="tf-icons bx bx-info-circle"></span>
@@ -41,7 +43,9 @@
               <th>Contributors</th>
               <th>Created</th>
               <th>Last Updated</th>
-              <th>Actions</th>
+              @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+                <th>Actions</th>
+              @endif
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
@@ -72,22 +76,27 @@
                 <td>{{ $board->created_at->format('M d, Y h:i A') }}</td>
                 <td>{{ $board->updated_at->diffForHumans() }}</td>
 
-                <td>
-                  <div class="dropdown">
-                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"
-                      aria-expanded="false">
-                      <i class="bx bx-dots-vertical-rounded"></i>
-                    </button>
-                    <div class="dropdown-menu" style="">
-                      <button class="dropdown-item edit_board_btn" data-board-name="{{ $board->name }}" data-board-sorting="{{ $board->sorting }}" data-board-update-route="{{ route('board.update', $board->id) }}"><i class="bx bx-edit-alt me-1"></i> Edit</button>
-                      <form action="{{ route('board.delete', $board->id) }}" method="POST">
-                        @method('DELETE')
-                        @csrf
-                        <button class="dropdown-item"><i class="bx bx-trash me-1"></i> Delete</button>
-                      </form>
+                @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+                  <td>
+                    <div class="dropdown">
+                      <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bx bx-dots-vertical-rounded"></i>
+                      </button>
+                      <div class="dropdown-menu" style="">
+                        <button class="dropdown-item edit_board_btn" data-board-name="{{ $board->name }}"
+                          data-board-sorting="{{ $board->sorting }}"
+                          data-board-update-route="{{ route('board.update', $board->id) }}"><i
+                            class="bx bx-edit-alt me-1"></i> Edit</button>
+                        <form action="{{ route('board.delete', $board->id) }}" method="POST">
+                          @method('DELETE')
+                          @csrf
+                          <button class="dropdown-item"><i class="bx bx-trash me-1"></i> Delete</button>
+                        </form>
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  </td>
+                @endif
               </tr>
             @empty
               <tr>
@@ -144,8 +153,9 @@
                       <small class="text-muted">{{ $user->email }}</small>
                     </div>
                     <div class="col-3 text-end">
-                      @if ($user->pivot->role !== $project::ROLE_ADMIN)
-                        <form action="{{ route('project.revokeAccess', ['id' => $project->id, 'userId' => $user->id]) }}"
+                      @if ($user->pivot->role !== $project::ROLE_ADMIN && Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+                        <form
+                          action="{{ route('project.revokeAccess', ['id' => $project->id, 'userId' => $user->id]) }}"
                           method="POST">
                           @csrf
                           @method('DELETE')
@@ -176,66 +186,69 @@
 
 
     {{-- Edit Board Modal --}}
-    <div class="modal fade" id="editBoardModal" data-bs-backdrop="static" tabindex="-1">
-      <div class="modal-dialog">
-        <form class="modal-content" id="editBoardForm" action="" method="POST" enctype="multipart/form-data">
-          @csrf
-          @method('PUT')
+    @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+      <div class="modal fade" id="editBoardModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog">
+          <form class="modal-content" id="editBoardForm" action="" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-          <div class="modal-header">
-            <h5 class="modal-title" id="backDropModalTitle">Edit Board</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-12 mb-3">
-                <label for="edit-board-name" class="form-label">Name</label>
-                <input type="text" name="name" value="{{ old('name') }}" id="edit-board-name"
-                  class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name" required />
-                @error('name', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
-              <div class="col-12 mb-3">
-                <label for="board-sorting" class="form-label">Sorting</label>
-                <input type="text" name="sorting" value="{{ old('sorting') }}" id="edit-board-sorting"
-                  class="form-control @error('sorting', 'board') is-invalid @enderror" placeholder="Enter Sorting"
-                  required />
-                @error('sorting', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
-              <div class="col-12">
-                <div class="form-check mt-3">
-                  <input class="form-check-input" type="checkbox" value="1" id="close-board" name="close">
-                  <label class="form-check-label" for="close-board"> Close the board </label>
+            <div class="modal-header">
+              <h5 class="modal-title" id="backDropModalTitle">Edit Board</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-12 mb-3">
+                  <label for="edit-board-name" class="form-label">Name</label>
+                  <input type="text" name="name" value="{{ old('name') }}" id="edit-board-name"
+                    class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name"
+                    required />
+                  @error('name', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
                 </div>
-                @error('name', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
+                <div class="col-12 mb-3">
+                  <label for="board-sorting" class="form-label">Sorting</label>
+                  <input type="text" name="sorting" value="{{ old('sorting') }}" id="edit-board-sorting"
+                    class="form-control @error('sorting', 'board') is-invalid @enderror" placeholder="Enter Sorting"
+                    required />
+                  @error('sorting', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                </div>
+                <div class="col-12">
+                  <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" value="1" id="close-board" name="close">
+                    <label class="form-check-label" for="close-board"> Close the board </label>
                   </div>
-                @enderror
-                <div class="alert alert-secondary mt-3" role="alert">
-                  <span class="bx bx-bell"></span>
-                  Closed boards are not displayed in Project details page. But you can always check the boards in the
-                  Project's <a href="#">Board History</a> Page
+                  @error('name', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                  <div class="alert alert-secondary mt-3" role="alert">
+                    <span class="bx bx-bell"></span>
+                    Closed boards are not displayed in Project details page. But you can always check the boards in the
+                    Project's <a href="#">Board History</a> Page
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    @endif
     {{-- End Edit Board Modal --}}
 
   </div>

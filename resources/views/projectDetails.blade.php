@@ -54,21 +54,25 @@
       {{-- Project Actions --}}
       <div style="min-width: 150px" class="ms-auto">
         {{-- Add Group Button --}}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBoardModal"
-          aria-controls="createBoardModal">
-          <span class="tf-icons bx bx-plus"></span>&nbsp; Add Board
-        </button>
+        @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBoardModal"
+            aria-controls="createBoardModal">
+            <span class="tf-icons bx bx-plus"></span>&nbsp; Add Board
+          </button>
+        @endif
         {{-- End Add Group Button --}}
 
         {{-- Invite Button --}}
-        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#invitationOffCanvas"
-          aria-controls="invitationOffCanvas">
-          <span class="tf-icons bx bx-user-plus"></span>&nbsp; Invite
-        </button>
+        @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+          <button type="button" class="btn btn-primary me-1" data-bs-toggle="offcanvas"
+            data-bs-target="#invitationOffCanvas" aria-controls="invitationOffCanvas">
+            <span class="tf-icons bx bx-user-plus"></span>&nbsp; Invite
+          </button>
+        @endif
         {{-- End Invite Button --}}
 
         {{-- Dropdown --}}
-        <div class="btn-group">
+        <div class="btn-group float-end">
           <button type="button" class="btn btn-outline-primary btn-icon dropdown-toggle hide-arrow"
             data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bx bx-dots-vertical-rounded"></i>
@@ -80,18 +84,20 @@
             <li><a class="dropdown-item" href="{{ route('board.history', $project->id) }}"><span
                   class="bx bx-info-circle"></span> Boards History</a>
             </li>
-            <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
-                data-bs-target="#editModal"><span class="bx bx-edit-alt"></span> Edit</a></li>
-            <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas"
-                data-bs-target="#invitationOffCanvas"><span class="bx bx-user-plus"></span> Invite</a></li>
-            {{-- <li><a class="dropdown-item" href="javascript:void(0);"><span class="bx bx-user-check"></span> Permissions</a> --}}
-            </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li><a class="dropdown-item text-danger" href="javascript:void(0);">
-                <span class="bx bx-trash"></span> Delete
-              </a></li>
+            @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+              <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
+                  data-bs-target="#editModal"><span class="bx bx-edit-alt"></span> Edit</a></li>
+              <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="offcanvas"
+                  data-bs-target="#invitationOffCanvas"><span class="bx bx-user-plus"></span> Invite</a></li>
+              {{-- <li><a class="dropdown-item" href="javascript:void(0);"><span class="bx bx-user-check"></span> Permissions</a> --}}
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li><a class="dropdown-item text-danger" href="javascript:void(0);">
+                  <span class="bx bx-trash"></span> Delete
+                </a></li>
+            @endif
           </ul>
         </div>
         {{-- End Dropdown --}}
@@ -101,91 +107,93 @@
     {{-- End Project Header --}}
 
     {{-- Invite Member offcanvas --}}
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="invitationOffCanvas" aria-labelledby="offcanvasEndLabel">
-      <div class="offcanvas-header">
-        <h5 id="offcanvasEndLabel" class="offcanvas-title">
-          <span class="bx bx-user-plus mt-n1"></span>
-          Invite Member
-        </h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body mx-0 flex-grow-0">
-
-        <form action="{{ route('invitations.store') }}" method="POST">
-          @csrf
-          <input type="hidden" name="type" value="project">
-          <input type="hidden" name="id" value="{{ $project->id }}">
-
-          <div class="mb-3">
-            <label for="invitation-email" class="form-label">Email address</label>
-            <div class="input-group">
-              <span class="input-group-text" id="invitation-addon">
-                <span class="bx bx-envelope"></span>
-              </span>
-              <input type="email" name="email" value="{{ old('email') }}"
-                class="form-control @error('email', 'invitation') is-invalid @enderror" placeholder="Enter Email"
-                aria-label="Enter Email" aria-describedby="invitation-addon" required>
-            </div>
-            @error('email', 'invitation')
-              <div class="form-text text-danger">
-                {{ $message }}
-              </div>
-            @enderror
-          </div>
-
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary">
-              <span class="tf-icons bx bx-paper-plane"></span>&nbsp; Send Invite
-            </button>
-
-            <button type="button" class="btn btn-outline-secondary d-grid w-100" data-bs-dismiss="offcanvas">
-              Cancel
-            </button>
-          </div>
-        </form>
-
-        @if (count($project->invites) > 0)
-          <hr>
-          <h5 class="offcanvas-title">
-            <span class="bx bx-time mt-n1"></span>
-            Invitation History
+    @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="invitationOffCanvas" aria-labelledby="offcanvasEndLabel">
+        <div class="offcanvas-header">
+          <h5 id="offcanvasEndLabel" class="offcanvas-title">
+            <span class="bx bx-user-plus mt-n1"></span>
+            Invite Member
           </h5>
-          <ul class="list-group list-group-flush">
-            @foreach ($project->invites as $invite)
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <p class="mb-0">{{ $invite->email }}</p>
-                  <small class="text-dark">Expires: {{ $invite->expires->format('M d, Y') }}</small>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body mx-0 flex-grow-0">
+
+          <form action="{{ route('invitations.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="type" value="project">
+            <input type="hidden" name="id" value="{{ $project->id }}">
+
+            <div class="mb-3">
+              <label for="invitation-email" class="form-label">Email address</label>
+              <div class="input-group">
+                <span class="input-group-text" id="invitation-addon">
+                  <span class="bx bx-envelope"></span>
+                </span>
+                <input type="email" name="email" value="{{ old('email') }}"
+                  class="form-control @error('email', 'invitation') is-invalid @enderror" placeholder="Enter Email"
+                  aria-label="Enter Email" aria-describedby="invitation-addon" required>
+              </div>
+              @error('email', 'invitation')
+                <div class="form-text text-danger">
+                  {{ $message }}
                 </div>
+              @enderror
+            </div>
 
-                <div class="d-flex">
-                  <form action="{{ route('invitations.resend', $invite->id) }}" method="POST" class="me-2">
-                    @csrf
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <span class="tf-icons bx bx-paper-plane"></span>&nbsp; Send Invite
+              </button>
 
-                    <button type="submit" class="btn rounded-pill btn-icon btn-outline-primary"
-                      data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="right" data-bs-html="false"
-                      title="Resend invitation email">
-                      <span class="tf-icons bx bx-redo"></span>
-                    </button>
-                  </form>
-                  <form action="{{ route('invitations.delete', $invite->id) }}" method="POST">
-                    @csrf
-                    @method('DELETE')
+              <button type="button" class="btn btn-outline-secondary d-grid w-100" data-bs-dismiss="offcanvas">
+                Cancel
+              </button>
+            </div>
+          </form>
 
-                    <button type="submit" class="btn rounded-pill btn-icon btn-outline-danger"
-                      data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="right" data-bs-html="false"
-                      title="Revoke and delete Invitation">
-                      <span class="tf-icons bx bx-trash"></span>
-                    </button>
-                  </form>
-                </div>
-              </li>
-            @endforeach
-          </ul>
-        @endif
+          @if (count($project->invites) > 0)
+            <hr>
+            <h5 class="offcanvas-title">
+              <span class="bx bx-time mt-n1"></span>
+              Invitation History
+            </h5>
+            <ul class="list-group list-group-flush">
+              @foreach ($project->invites as $invite)
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <p class="mb-0">{{ $invite->email }}</p>
+                    <small class="text-dark">Expires: {{ $invite->expires->format('M d, Y') }}</small>
+                  </div>
 
+                  <div class="d-flex">
+                    <form action="{{ route('invitations.resend', $invite->id) }}" method="POST" class="me-2">
+                      @csrf
+
+                      <button type="submit" class="btn rounded-pill btn-icon btn-outline-primary"
+                        data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="right" data-bs-html="false"
+                        title="Resend invitation email">
+                        <span class="tf-icons bx bx-redo"></span>
+                      </button>
+                    </form>
+                    <form action="{{ route('invitations.delete', $invite->id) }}" method="POST">
+                      @csrf
+                      @method('DELETE')
+
+                      <button type="submit" class="btn rounded-pill btn-icon btn-outline-danger"
+                        data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="right" data-bs-html="false"
+                        title="Revoke and delete Invitation">
+                        <span class="tf-icons bx bx-trash"></span>
+                      </button>
+                    </form>
+                  </div>
+                </li>
+              @endforeach
+            </ul>
+          @endif
+
+        </div>
       </div>
-    </div>
+    @endif
     {{-- End Invite Member offcanvas --}}
 
     <hr>
@@ -202,11 +210,13 @@
               <button type="button" class="btn btn-sm btn-primary add_task_btn" data-board-id="{{ $board->id }}">
                 <span class="tf-icons bx bx-plus"></span>&nbsp; Add Task
               </button>
-              <button type="button" class="btn btn-sm btn-icon btn-outline-primary edit_board_btn"
-                data-board-name="{{ $board->name }}" data-board-sorting="{{ $board->sorting }}"
-                data-board-update-route="{{ route('board.update', $board->id) }}">
-                <span class="tf-icons bx bx-edit-alt"></span>
-              </button>
+              @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+                <button type="button" class="btn btn-sm btn-icon btn-outline-primary edit_board_btn"
+                  data-board-name="{{ $board->name }}" data-board-sorting="{{ $board->sorting }}"
+                  data-board-update-route="{{ route('board.update', $board->id) }}">
+                  <span class="tf-icons bx bx-edit-alt"></span>
+                </button>
+              @endif
             </div>
           </div>
 
@@ -325,7 +335,7 @@
                       <small class="text-muted">{{ $user->email }}</small>
                     </div>
                     <div class="col-3 text-end">
-                      @if ($user->pivot->role !== $project::ROLE_ADMIN)
+                      @if ($user->pivot->role !== $project::ROLE_ADMIN && Auth::user()->getProjectRole($project->id) == $project::ROLE_ADMIN)
                         <form
                           action="{{ route('project.revokeAccess', ['id' => $project->id, 'userId' => $user->id]) }}"
                           method="POST">
@@ -357,52 +367,55 @@
     {{-- End Project Info Modal --}}
 
     {{-- Edit Modal --}}
-    <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1">
-      <div class="modal-dialog">
-        <form class="modal-content" action="{{ route('project.update', $project->id) }}" method="POST"
-          enctype="multipart/form-data">
-          @csrf
-          @method('PUT')
-          <div class="modal-header">
-            <h5 class="modal-title" id="backDropModalTitle">Edit Project</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col mb-3">
-                <label for="project-name" class="form-label">Name</label>
-                <input type="text" name="name" value="{{ old('name', $project->name) }}" id="project-name"
-                  class="form-control @error('name', 'project') is-invalid @enderror" placeholder="Enter Name"
-                  required />
-                @error('name', 'project')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
+
+    @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+      <div class="modal fade" id="editModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog">
+          <form class="modal-content" action="{{ route('project.update', $project->id) }}" method="POST"
+            enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="modal-header">
+              <h5 class="modal-title" id="backDropModalTitle">Edit Project</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col mb-3">
+                  <label for="project-name" class="form-label">Name</label>
+                  <input type="text" name="name" value="{{ old('name', $project->name) }}" id="project-name"
+                    class="form-control @error('name', 'project') is-invalid @enderror" placeholder="Enter Name"
+                    required />
+                  @error('name', 'project')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <label for="project-description" class="form-label">Description</label>
+                  <textarea name="description" id="project-description"
+                    class="form-control @error('description', 'project') is-invalid @enderror" rows="5">{{ old('description', $project->description) }}</textarea>
+                  @error('description', 'project')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <label for="project-description" class="form-label">Description</label>
-                <textarea name="description" id="project-description"
-                  class="form-control @error('description', 'project') is-invalid @enderror" rows="5">{{ old('description', $project->description) }}</textarea>
-                @error('description', 'project')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">Save</button>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    @endif
     {{-- End Edit Modal --}}
 
     {{-- Create Task Modal --}}
@@ -539,102 +552,108 @@
     {{-- End Edit Task Modal --}}
 
     {{-- Create Board Modal --}}
-    <div class="modal fade" id="createBoardModal" data-bs-backdrop="static" tabindex="-1">
-      <div class="modal-dialog">
-        <form class="modal-content" action="{{ route('board.store') }}" method="POST" enctype="multipart/form-data">
-          @csrf
-          <div class="modal-header">
-            <h5 class="modal-title" id="backDropModalTitle">Create Board</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col mb-3">
-                <input type="hidden" name="project_id" value="{{ $project->id }}">
-                <label for="board-name" class="form-label">Name</label>
-                <input type="text" name="name" value="{{ old('name') }}" id="board-name"
-                  class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name" required />
-                @error('name', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
+    @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+      <div class="modal fade" id="createBoardModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog">
+          <form class="modal-content" action="{{ route('board.store') }}" method="POST"
+            enctype="multipart/form-data">
+            @csrf
+            <div class="modal-header">
+              <h5 class="modal-title" id="backDropModalTitle">Create Board</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col mb-3">
+                  <input type="hidden" name="project_id" value="{{ $project->id }}">
+                  <label for="board-name" class="form-label">Name</label>
+                  <input type="text" name="name" value="{{ old('name') }}" id="board-name"
+                    class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name"
+                    required />
+                  @error('name', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    @endif
     {{-- End Create Board Modal --}}
 
     {{-- Edit Board Modal --}}
-    <div class="modal fade" id="editBoardModal" data-bs-backdrop="static" tabindex="-1">
-      <div class="modal-dialog">
-        <form class="modal-content" id="editBoardForm" action="" method="POST" enctype="multipart/form-data">
-          @csrf
-          @method('PUT')
+    @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+      <div class="modal fade" id="editBoardModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog">
+          <form class="modal-content" id="editBoardForm" action="" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-          <div class="modal-header">
-            <h5 class="modal-title" id="backDropModalTitle">Edit Board</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-12 mb-3">
-                <label for="edit-board-name" class="form-label">Name</label>
-                <input type="text" name="name" value="{{ old('name') }}" id="edit-board-name"
-                  class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name"
-                  required />
-                @error('name', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
-              <div class="col-12 mb-3">
-                <label for="board-sorting" class="form-label">Sorting</label>
-                <input type="text" name="sorting" value="{{ old('sorting') }}" id="edit-board-sorting"
-                  class="form-control @error('sorting', 'board') is-invalid @enderror" placeholder="Enter Sorting"
-                  required />
-                @error('sorting', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
-                  </div>
-                @enderror
-              </div>
-              <div class="col-12">
-                <div class="form-check mt-3">
-                  <input class="form-check-input" type="checkbox" value="1" id="close-board" name="close">
-                  <label class="form-check-label" for="close-board"> Close the board </label>
+            <div class="modal-header">
+              <h5 class="modal-title" id="backDropModalTitle">Edit Board</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-12 mb-3">
+                  <label for="edit-board-name" class="form-label">Name</label>
+                  <input type="text" name="name" value="{{ old('name') }}" id="edit-board-name"
+                    class="form-control @error('name', 'board') is-invalid @enderror" placeholder="Enter Name"
+                    required />
+                  @error('name', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
                 </div>
-                @error('name', 'board')
-                  <div class="form-text text-danger">
-                    {{ $message }}
+                <div class="col-12 mb-3">
+                  <label for="board-sorting" class="form-label">Sorting</label>
+                  <input type="text" name="sorting" value="{{ old('sorting') }}" id="edit-board-sorting"
+                    class="form-control @error('sorting', 'board') is-invalid @enderror" placeholder="Enter Sorting"
+                    required />
+                  @error('sorting', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                </div>
+                <div class="col-12">
+                  <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" value="1" id="close-board" name="close">
+                    <label class="form-check-label" for="close-board"> Close the board </label>
                   </div>
-                @enderror
-                <div class="alert alert-secondary mt-3" role="alert">
-                  <span class="bx bx-bell"></span>
-                  Closed boards are not displayed in Project details page. But you can always check the boards in the
-                  Project's <a href="{{ route('board.history', $project->id) }}">Board History</a> Page
+                  @error('name', 'board')
+                    <div class="form-text text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                  <div class="alert alert-secondary mt-3" role="alert">
+                    <span class="bx bx-bell"></span>
+                    Closed boards are not displayed in Project details page. But you can always check the boards in the
+                    Project's <a href="{{ route('board.history', $project->id) }}">Board History</a> Page
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Close
-            </button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-        </form>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    @endif
     {{-- End Edit Board Modal --}}
 
   </div>
@@ -673,7 +692,7 @@
         let data = table.row(this).data();
         let taskId = table.row(this).id();
         taskId = parseInt(taskId.match(/\d+/)[0]);
-        window.location.href = '{{ route('task.show') }}?id='+taskId;
+        window.location.href = '{{ route('task.show') }}?id=' + taskId;
         // $.ajax({
         //   url: '{{ route('task.show') }}',
         //   data: {

@@ -51,19 +51,22 @@
             <li><a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
                 data-bs-target="#editModal"><span class="bx bx-edit-alt"></span> Edit</a></li>
             </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li>
-              <form action="{{ route('task.delete', $task->id) }}" method="POST">
-                @csrf
-                @method('DELETE')
 
-                <button class="dropdown-item text-danger">
-                  <span class="bx bx-trash"></span> Delete
-                </button>
-              </form>
-            </li>
+            @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <form action="{{ route('task.delete', $task->id) }}" method="POST">
+                  @csrf
+                  @method('DELETE')
+
+                  <button class="dropdown-item text-danger">
+                    <span class="bx bx-trash"></span> Delete
+                  </button>
+                </form>
+              </li>
+            @endif
           </ul>
         </div>
         {{-- End Dropdown --}}
