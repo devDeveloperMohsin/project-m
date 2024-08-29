@@ -133,6 +133,9 @@ class InvitationController extends Controller
             $model = Project::findOrFail($invitation->model_id);
             $model->users()->attach($user->id, ['role' => Project::ROLE_MEMBER]);
 
+            // In case of project we will add the user to that workspace as well as member
+            $model->workspace->users()->attach($user->id, ['role' => Workspace::ROLE_MEMBER]);
+
             // Delete the invite
             $invitation->delete();
 

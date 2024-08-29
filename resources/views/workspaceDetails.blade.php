@@ -172,7 +172,7 @@
                         <small class="text-muted">{{ $user->email }}</small>
                       </div>
                       <div class="col-3 text-end">
-                        @if ($user->pivot->role !== $workspace::ROLE_ADMIN)
+                        @if ($user->pivot->role !== $workspace::ROLE_ADMIN && $workspace->userIsAdmin(Auth::id()))
                           <form
                             action="{{ route('workspaces.revokeAccess', ['id' => $workspace->id, 'userId' => $user->id]) }}"
                             method="POST">
