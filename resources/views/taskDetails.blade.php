@@ -132,7 +132,7 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col mb-3">
+                  <!-- <div class="col mb-3">
                     <label for="assigned-to" class="form-label">Assigned To</label>
                     <p>
                       @foreach ($task->users as $u)
@@ -142,7 +142,52 @@
                         @endif
                       @endforeach
                     </p>
-                  </div>
+                  </div> -->
+                 <div class="col mb-3">
+
+    <label for="assigned-to" class="form-label">Assigned To</label>
+
+    <div class="d-flex align-items-center">
+
+        <!-- Avatar for each user -->
+
+        @foreach ($task->users as $u)
+
+            <div class="avatar avatar-sm me-2">
+
+                <img src="{{ !empty($u->getFirstMediaUrl()) ? $u->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) }}"
+
+                     alt="user-avatar"
+
+                     class="d-block rounded-circle"
+
+                     style="object-fit: cover"
+
+                     height="30" width="30" />
+
+            </div>
+
+            <!-- User name -->
+
+            <p class="mb-0">
+
+                {{ $u->name }}
+
+            </p>
+
+            @if (!$loop->last)
+
+                <!-- If there are multiple users, add a comma between names -->
+
+                <span>, </span>
+
+            @endif
+
+        @endforeach
+
+    </div>
+
+</div>
                 </div>
               </div>
               {{-- End Right --}}
