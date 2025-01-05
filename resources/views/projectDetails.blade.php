@@ -247,7 +247,18 @@
                           <td>{{ $task->priority }}</td>
                           <td>{{ $task->due_date->format('d/M/Y') }}</td>
                           <td>{{ $task->type }}</td>
-                          <td></td>
+                          <td> 
+                                                @foreach ($task->users as $user)
+                                                    <div class="avatar avatar-sm me-2">
+                                                        <img src="{{ !empty($user->getFirstMediaUrl()) ? $user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
+                                                             alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30" width="30" />
+                                                    </div>
+                                                    <!-- {{ $user->name }} -->
+                                                    @if (!$loop->last)
+                                                        ,
+                                                    @endif
+                                                @endforeach
+                                            </td>
                           <td>{{ $task->created_at->format('d/M/Y') }}</td>
                           <td>{{ $task->updated_at->diffForHumans() }}</td>
                         </tr>
