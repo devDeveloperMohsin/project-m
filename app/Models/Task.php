@@ -57,4 +57,8 @@ class Task extends Model
     {
         return $this->belongsToMany(User::class, 'task_users', 'task_id', 'user_id')->withPivot('role')->withTimestamps();
     }
+    public function subItems()
+    {
+        return $this->hasMany(Subtask::class);
+    }
 }

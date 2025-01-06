@@ -173,6 +173,269 @@
               <form action="{{ route('task.storeComment') }}" method="post" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="task_id" value="{{ $task->id }}">
+
+                {{-- ----------------------------------------- --}}
+
+                                  {{-- <script src="https://cdn.jsdelivr.net/npm/@tinymce/tinymce-webcomponent@2/dist/tinymce-webcomponent.min.js"></script>
+      <tinymce-editor
+      api-key="0cbpdbq19aaox07ddjztq91o9e0ykor71fy01te03ogwh62p">
+      </tinymce-editor> --}}
+
+
+
+      {{--  --}}
+
+
+
+                {{-- --------------------------------------------- --}}
+
+                <div class="mb-3">
+                  <label class="form-label">Write a comment message</label>
+                  <textarea class="form-control" name="comment" aria-label="Add comment" aria-describedby="task's comment box">{{ old('comment') }}</textarea>
+                </div>
+                <div class="mb-3">
+                  <input class="form-control" type="file" name="attachments[]" multiple />
+                </div>
+
+                <button class="btn btn-sm btn-primary">Add comment</button>
+              </form>
+
+              @if (is_countable($comments) && count($comments) > 0)
+                <div class="mt-5">
+                  @foreach ($comments as $comment)
+                    <div class="comments">
+                      <div class="user-icon">
+                        <a href="javascript:void(0)">
+                          <img
+                            src="{{ !empty($comment->user->getFirstMediaUrl()) ? $comment->user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->name) }}"
+                            alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30"
+                            width="30" />
+                        </a>
+                      </div>
+                      <div class="comment-body">
+                        <div class="comment-title">
+                          <a href="javascript:void(0)">{{ $comment->user->name }}</a>
+                          <span>{{ $comment->created_at->diffForHumans() }}</span>
+                          @if ($comment->user_id == Auth::id())
+                            <form action="{{ route('task.deleteComment', $comment->id) }}" method="POST"
+                              class="me-1 d-inline-block">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="btn btn-icon btn-sm btn-simple">
+                                <span class="tf-icons bx bx-trash"></span>
+                              </button>
+                            </form>
+                          @endif
+                        </div>
+                        <p>
+                          {!! nl2br($comment->comment) !!}
+                        </p>
+                        @if ($comment->getMedia('attachments')->count() > 0)
+                          <div class="attachments">
+                            <small class="text-light fw-semibold">Attachments</small>
+                            <div class="demo-inline-spacing mt-3">
+                              <div class="list-group">
+                                @foreach ($comment->getMedia('attachments') as $ca)
+                                  <a href="{{ $ca->getUrl() }}" target="_blank"
+                                    class="list-group-item list-group-item-action">{{ $ca->name }}</a>
+                                @endforeach
+                              </div>
+                            </div>
+                          </div>
+                        @endif
+                      </div>
+                    </div>
+                  @endforeach
+                </div>
+              @endif
+
+            </div>
+            {{-- End Messages Comments --}}
+
+            {{-- History --}}
+            <div class="tab-pane fade" id="navs-top-profile" role="tabpanel" bis_skin_checked="1">
+              <div>
+                @foreach ($task->history as $h)
+                  <div class="comments history mb-4">
+                    <div class="user-icon">
+                      <a href="javascript:void(0)">
+                        <img
+                          src="{{ !empty($h->user->getFirstMediaUrl()) ? $h->user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($h->user->name) }}"
+                          alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30"
+                          width="30" />
+                      </a>
+                    </div>
+                    <div class="comment-body">
+                      <div class="comment-title">
+                        <a href="javacript:void(0)">{{ $h->user->name }}</a>
+                        <span>{{ $h->created_at->diffForHumans() }}</span>
+                      </div>
+                      <p class="mb-1">
+                        {{ $h->type }}
+                      </p>
+                      @foreach (json_decode($h->data) ?? [] as $key => $value)
+                        <p class="m-0 text-sm"> {{ $key }} >>> {{ $value }}</p>
+                      @endforeach
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+            {{-- End History --}}
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-tile mb-0">{{ $task->board->name }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group" bis_skin_checked="1">
+              @forelse ($task->board->tasks as $t)
+                <a href="{{ route('task.show', ['id' => $t->id]) }}"
+                  class="list-group-item list-group-item-action d-flex justify-content-between">
+                  <div class="li-wrapper d-flex justify-content-start align-items-center" bis_skin_checked="1">
+                    <div class="avatar avatar-sm me-3" bis_skin_checked="1">
+                      @foreach ($t->users as $u)
+                        <img
+                          src="{{ !empty($u->getFirstMediaUrl()) ? $u->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) }}"
+                          alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30"
+                          width="30" />
+                      @endforeach
+
+                    </div>
+                    <div class="list-content" bis_skin_checked="1">
+                      <h6 class="mb-1">{{ $t->title }}</h6>
+                      <small class="text-muted">{{ $t->status }}</small>
+                    </div>
+                  </div>
+                  <small>{{ $t->created_at->diffForHumans() }}</small>
+                </a>
+              @empty
+                <div class="alert alert-primary">No other tasks in this sprint</div>
+              @endforelse
+            </div>
+
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header" bis_skin_checked="1">
+            <h5 class="card-tile mb-0">SubTask Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              @foreach ($task->subItems as $subtask)
+              {{-- Left --}}
+              <div class="col-md-8 col-lg-7">
+                <div class="row">
+                  <div class="col mb-3">
+                    <label for="edit-task-title" class="form-label">Title</label>
+                    <p>{{ $subtask->title }}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col mb-3">
+                    <label class="form-label">Description</label>
+                    <div>{!! $subtask->description !!}</div>
+
+                  </div>
+                </div>
+              </div>
+              {{-- End Left --}}
+
+              {{-- Right --}}
+              <div class="col-md-4 col-lg-5">
+                <div class="row g-2">
+                  <div class="col mb-3">
+                    <label for="edit-status-select" class="form-label">Select Status</label>
+                    <p>{{ $subtask->status }}</p>
+                  </div>
+                  <div class="col mb-3">
+                    <label for="edit-priority-select" class="form-label">Select Priority</label>
+                    <p>{{ $subtask->priority }}</p>
+                  </div>
+                </div>
+                <div class="row g-2">
+                  <div class="col mb-3">
+                    <label for="edit-task-type" class="form-label">Task Type</label>
+                    <p>{{ $subtask->type }}</p>
+                  </div>
+                  <div class="col mb-3">
+                    <label for="edit-due-date" class="form-label">Due Date</label>
+                    <p>{{ \Carbon\Carbon::parse($subtask->due_date)->format('d/M/Y') }}</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col mb-3">
+                    <label for="assigned-to" class="form-label">Assigned To</label>
+                    <p>
+                      @foreach ($task->users as $u)
+                        {{ $u->name }}
+                        @if (!$loop->last)
+                          ,
+                        @endif
+                      @endforeach
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {{-- End Right --}}
+                
+              @endforeach
+              
+            </div>
+
+            <div class="clearfix"></div>
+          </div>
+        </div>
+
+        <div class="nav-align-top mb-4" bis_skin_checked="1">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="true">
+                <i class="tf-icons bx bx-message-square"></i> Messages
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navs-top-profile" aria-controls="navs-top-profile" aria-selected="false" tabindex="-1">
+                <i class="tf-icons bx bx-home"></i> History
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content" bis_skin_checked="1">
+            {{-- Messages / Comments --}}
+            <div class="tab-pane fade active show" id="navs-top-home" role="tabpanel" bis_skin_checked="1">
+              <form action="{{ route('task.storeComment') }}" method="post" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="task_id" value="{{ $task->id }}">
+
+                {{-- ----------------------------------------- --}}
+
+                                  {{-- <script src="https://cdn.jsdelivr.net/npm/@tinymce/tinymce-webcomponent@2/dist/tinymce-webcomponent.min.js"></script>
+      <tinymce-editor
+      api-key="0cbpdbq19aaox07ddjztq91o9e0ykor71fy01te03ogwh62p">
+      </tinymce-editor> --}}
+
+
+
+      {{--  --}}
+
+
+
+                {{-- --------------------------------------------- --}}
+
                 <div class="mb-3">
                   <label class="form-label">Write a comment message</label>
                   <textarea class="form-control" name="comment" aria-label="Add comment" aria-describedby="task's comment box">{{ old('comment') }}</textarea>

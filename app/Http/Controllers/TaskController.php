@@ -69,7 +69,7 @@ class TaskController extends Controller
             'id' => ['required', 'integer', 'min:1'],
         ]);
 
-        $task = Task::with('users', 'board.tasks', 'board.tasks.users', 'history', 'history.user')->findOrFail($request->get('id'));
+        $task = Task::with('subItems','users', 'board.tasks', 'board.tasks.users', 'history', 'history.user')->findOrFail($request->get('id'));
         $project = $task->board->project;
         $comments = TaskComment::with('user')->where('task_id', $task->id)->latest()->get();
         return view('taskDetails', compact('task', 'project', 'comments'));
