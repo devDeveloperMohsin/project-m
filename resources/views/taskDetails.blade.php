@@ -4,7 +4,63 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.4.1/css/rowReorder.dataTables.min.css">
-@endsection
+
+
+<style>
+
+    .suggestion-box {
+
+    position: absolute;
+
+    z-index: 1000;
+
+    background: #fff;
+
+    border: 1px solid #ccc;
+
+    width: 20%;
+
+    max-height: 200px;
+
+    overflow-y: auto;
+
+}
+
+
+
+.suggestion-list {
+
+    list-style-type: none;
+
+    padding: 0;
+
+    margin: 0;
+
+}
+
+
+
+.suggestion-item {
+
+    padding: 10px;
+
+    cursor: pointer;
+
+}
+
+
+
+.suggestion-item:hover {
+
+    background-color: #f0f0f0;
+
+}
+
+
+
+  </style>
+
+  @endsection
 
 @php
   $taskStatuses = [
@@ -220,14 +276,48 @@
                 <input type="hidden" name="task_id" value="{{ $task->id }}">
                 <div class="mb-3">
                   <label class="form-label">Write a comment message</label>
-                  <textarea class="form-control" name="comment" aria-label="Add comment" aria-describedby="task's comment box">{{ old('comment') }}</textarea>
+                  {{-- <textarea class="form-control" name="comment" aria-label="Add comment" aria-describedby="task's comment box">{{ old('comment') }}</textarea>
                 </div>
                 <div class="mb-3">
                   <input class="form-control" type="file" name="attachments[]" multiple />
                 </div>
 
                 <button class="btn btn-sm btn-primary">Add comment</button>
-              </form>
+              </form> --}}
+
+                    <textarea
+
+                        class="form-control comment-input"
+
+                        name="comment"
+
+                        placeholder="Type @ to mention users"
+
+                        aria-label="Add comment"
+
+                        data-suggestion-url="{{ route('user.suggestions') }}">{{ old('comment') }}</textarea>
+
+
+
+                    <div class="suggestion-box d-none">
+
+                        <ul class="list-group suggestion-list"></ul>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="mb-3">
+
+                    <input class="form-control" type="file" name="attachments[]" multiple />
+
+                </div>
+               <button type="submit" class="btn btn-sm btn-primary">Add comment</button>
+            </form>
+            {{-- ------------------------ Updated --}}
+
 
               @if (is_countable($comments) && count($comments) > 0)
                 <div class="mt-5">
@@ -259,6 +349,94 @@
                         <p>
                           {!! nl2br($comment->comment) !!}
                         </p>
+                        <div class="replies ms-4">
+
+                            @foreach ($comment->replies as $reply)
+
+                                <div class="reply mb-2">
+
+                                    <div class="d-flex align-items-start">
+
+                                        <div class="user-icon me-2">
+
+                                            <img
+
+                                                src="{{ !empty($reply->user->getFirstMediaUrl()) ? $reply->user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($reply->user->name) }}"
+
+                                                alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30" width="30" />
+
+                                        </div>
+
+                                        <div class="reply-body">
+
+                                            <div class="reply-title">
+
+                                                <strong>{{ $reply->user->name }}</strong>
+
+                                                <span class="text-muted">{{ $reply->created_at->diffForHumans() }}</span>
+
+
+
+                                                @if ($reply->user_id == Auth::id()) {{-- Check if the reply belongs to the authenticated user --}}
+
+                                                    <form action="{{ route('reply.destroy', $reply->id) }}" method="POST" class="d-inline-block ms-2">
+
+                                                        @csrf
+
+                                                        @method('DELETE')
+
+                                                        <button type="submit" class="btn btn-icon btn-sm btn-simple" title="Delete Reply">
+
+                                                            <span class="tf-icons bx bx-trash"></span>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                @endif
+
+                                            </div>
+
+                                            <p>{!! nl2br(e($reply->comment)) !!}</p> {{-- Escape HTML content for security --}}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+
+
+                        <button class="btn btn-sm btn-link text-primary reply-toggle" data-comment-id="{{ $comment->id }}">
+
+                            Reply
+
+                        </button>
+
+                        {{-- Reply Form (Hidden by Default) --}}
+
+                        <div class="reply-form d-none" id="reply-form-{{ $comment->id }}">
+
+                            <form action="{{ route('task.storeReply') }}" method="POST">
+
+                                @csrf
+
+                                <input type="hidden" name="task_comment_id" value="{{ $comment->id }}">
+
+                                <textarea class="form-control" name="reply" placeholder="Write your reply..." required></textarea>
+
+                                <button type="submit" class="btn btn-primary btn-sm">Submit Reply</button>
+
+                            </form>
+
+                        </div>
+
+
+                        {{-- Updated --}}
                         @if ($comment->getMedia('attachments')->count() > 0)
                           <div class="attachments">
                             <small class="text-light fw-semibold">Attachments</small>
@@ -538,4 +716,194 @@
         });
     });
   </script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.reply-toggle').forEach(button => {
+
+        button.addEventListener('click', function () {
+
+            const commentId = this.dataset.commentId;
+
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+
+            replyForm.classList.toggle('d-none');
+
+        });
+
+    });
+
+});
+
+  </script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+    const commentInput = document.querySelector('.comment-input');
+
+    const suggestionBox = document.querySelector('.suggestion-box');
+
+    const suggestionList = suggestionBox.querySelector('.suggestion-list');
+
+
+
+    let queryTimeout;
+
+
+
+    commentInput.addEventListener('input', function () {
+
+        const cursorPosition = commentInput.selectionStart;
+
+        const text = commentInput.value;
+
+
+
+        // Detect `@` and get the current query
+
+        const atIndex = text.lastIndexOf('@', cursorPosition - 1);
+
+        if (atIndex !== -1) {
+
+            const query = text.substring(atIndex + 1, cursorPosition).trim();
+
+            var item = fetchSuggestions(query);
+
+            // alert(item);
+
+
+
+
+
+
+
+
+
+            // Fetch suggestions if query is not empty
+
+            if (query.length > 0) {
+
+                clearTimeout(queryTimeout);
+
+                queryTimeout = setTimeout(() => fetchSuggestions(query), 300); // Add debounce
+
+            } else {
+
+                suggestionBox.classList.add('d-none');
+
+            }
+
+        } else {
+
+            suggestionBox.classList.add('d-none');
+
+        }
+
+    });
+
+
+
+    function fetchSuggestions(query) {
+
+        const url = commentInput.getAttribute('data-suggestion-url');
+
+        fetch(`${url}?query=${query}`)
+
+            .then(response => response.json())
+
+            .then(users => renderSuggestions(users))
+
+            .catch(error => console.error('Error fetching suggestions:', error));
+
+    }
+
+
+
+    function renderSuggestions(users) {
+
+        suggestionList.innerHTML = '';
+
+        if (users.length > 0) {
+
+            users.forEach(user => {
+
+                const li = document.createElement('li');
+
+                li.className = 'list-group-item suggestion-item';
+
+                li.textContent = user.name;
+
+                li.dataset.id = user.id;
+
+
+
+                li.addEventListener('click', function () {
+
+                    insertUserMention(user.name);
+
+                });
+
+
+
+                suggestionList.appendChild(li);
+
+            });
+
+
+
+            suggestionBox.classList.remove('d-none');
+
+        } else {
+
+            suggestionBox.classList.add('d-none'); // Hide box if no results
+
+        }
+
+    }
+
+
+
+    function insertUserMention(username) {
+
+        const cursorPosition = commentInput.selectionStart;
+
+        const text = commentInput.value;
+
+        const atIndex = text.lastIndexOf('@', cursorPosition - 1);
+
+
+
+        if (atIndex !== -1) {
+
+            commentInput.value =
+
+                text.substring(0, atIndex) +
+
+                `@${username} ` +
+
+                text.substring(cursorPosition);
+
+        }
+
+
+
+        commentInput.focus();
+
+        suggestionBox.classList.add('d-none');
+
+    }
+
+    });
+
+
+
+  </script>
+
+
+
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
+use App\Models\Subtask;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -15,11 +16,11 @@ class ProjectController extends Controller
     /**
      * The store function in PHP validates and stores workspace data, then returns to the previous page
      * with a success message.
-     * 
+     *
      * @param Request request The  parameter is an instance of the Request class, which
      * represents an HTTP request made to the server. It contains all the data and information sent by
      * the client in the request.
-     * 
+     *
      * @return The code is returning a redirect back to the previous page with a success message.
      */
     public function store(Request $request)
@@ -41,13 +42,13 @@ class ProjectController extends Controller
     /**
      * The function updates a workspace's name and icon based on the request data and returns a success
      * message.
-     * 
+     *
      * @param Request request The `` parameter is an instance of the `Illuminate\Http\Request`
      * class. It represents the HTTP request made to the server and contains all the data sent with the
      * request, such as form inputs, query parameters, and uploaded files.
      * @param id The "id" parameter is the identifier of the workspace that needs to be updated. It is
      * used to find the specific workspace record in the database.
-     * 
+     *
      * @return a redirect back to the previous page with a success message.
      */
     public function update(Request $request, $id)
@@ -67,17 +68,22 @@ class ProjectController extends Controller
 
     /**
      * The show function retrieves a workspace by its ID and returns a view with the workspace details.
-     * 
+     *
      * @param id The "id" parameter is used to identify the specific workspace that needs to be shown.
      * It is typically an integer value that corresponds to the unique identifier of the workspace in
      * the database.
-     * 
+     *
      * @return a view called 'workspaceDetails' and passing the 'workspace' variable to the view.
      */
     public function show($id)
     {
+        $subtask=Subtask::where('task_id',$id)->get();
         $project = Project::with('users', 'invites', 'boards', 'boards.tasks')->findOrFail($id);
-        return view('projectDetails', compact('project'));
+        // return view('projectDetails', compact('project','subtask'));
+        return view('projectDetails', compact('project','subtask'));
+
+
+
     }
 
     public function destroy($id)
@@ -91,9 +97,9 @@ class ProjectController extends Controller
     /**
      * The starToggle function toggles the star status of a workspace and returns a success message
      * indicating whether the workspace has been marked or unmarked.
-     * 
+     *
      * @param id The "id" parameter is the identifier of the workspace that needs to be toggled.
-     * 
+     *
      * @return a redirect back to the previous page with a success message. The success message
      * indicates whether the workspace has been marked or unmarked as a star.
      */
