@@ -15,6 +15,11 @@ class TaskHistory extends Model
     const TYPE_COMMENTED = 'Added Comment';
     const TYPE_DELETED_COMMENTED = 'Deleted Comment';
 
+    const TYPE_DELETED_REPLIED = 'Deleted Comment';
+
+    const TYPE_REPLIED = 'replied';
+
+
     /**
      * The attributes that are mass assignable.
      *

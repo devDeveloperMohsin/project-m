@@ -1,12 +1,20 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SubItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -68,11 +76,48 @@ Route::middleware('auth')->group(function () {
     Route::delete('/task/{id}/delete', [TaskController::class, 'destroy'])->name('task.delete');
     Route::post('/task/comment/store', [TaskController::class, 'storeComment'])->name('task.storeComment');
     Route::delete('/task/comment/{id}/delete', [TaskController::class, 'destroyComment'])->name('task.deleteComment');
+    Route::delete('/replies/{id}', [TaskController::class, 'destroyReply'])->name('reply.destroy');
+    Route::get('/task-details/{id}', [TaskController::class, 'details'])->name('task.details');
+    Route::post('/tasks/store-reply', [TaskController::class, 'storeReply'])->name('task.storeReply');
+    Route::get('/user-suggestions', [TaskController::class, 'getSuggestions'])->name('user.suggestions');
+
+
     // End Task Routes
-    
+
     // End Project Routes
 
+
+    Route::get('/permission', [PermissionController::class, 'create'])->name('permission.create');
+    Route::post('/permission/store', [PermissionController::class, 'store'])->name('permission.store');
+    Route::get('/permission/index', [PermissionController::class, 'index'])->name('permission.index');
+    Route::get('/permission/edit{id}', [PermissionController::class, 'edit'])->name('permission.edit');
+    Route::put('/permission/{id}', [PermissionController::class, 'update'])->name('permission.update');
+    Route::delete('/permission/{id}', [PermissionController::class, 'destroy'])->name('permission.destroy');
+
+    Route::get('/role', [RoleController::class, 'create'])->name('role.create');
+    Route::post('/role/store', [RoleController::class, 'store'])->name('role.store');
+    Route::get('/role/index', [RoleController::class, 'index'])->name('role.index');
+    Route::get('/role/edit{id}', [RoleController::class, 'edit'])->name('role.edit');
+    Route::put('/role/{id}', [RoleController::class, 'update'])->name('role.update');
+    Route::delete('/role/{id}', [RoleController::class, 'destroy'])->name('role.destroy');
+
+    Route::resource('user', UserController::class);
+
+    // Route::get('/subitem/store', [SubItemController::class, 'store'])->name('subitem.store');
+    Route::post('/subitem/store', [SubItemController::class, 'store'])->name('subitem.store');
+
+
 });
+
+Route::post('/save-editor-data', function (Request $request) {
+    $content = $request->input('content');
+
+    // Save the content to the database or perform other actions
+    Log::info('Editor Content:', ['content' => $content]);
+
+    return response()->json(['message' => 'Data saved successfully!']);
+});
+
 
 Route::get('/collaborate', [InvitationController::class, 'joinTeam']);
 
