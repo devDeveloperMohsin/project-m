@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GroupChatController;
+use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
@@ -14,7 +16,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\SubItemController;
+use App\Http\Controllers\SubTaskController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -81,6 +83,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/tasks/store-reply', [TaskController::class, 'storeReply'])->name('task.storeReply');
     Route::get('/user-suggestions', [TaskController::class, 'getSuggestions'])->name('user.suggestions');
 
+    // ------- TASK SHOW URL -----------
+    // Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    // ------- TASK SHOW URL -----------
+
+
 
     // End Task Routes
 
@@ -103,11 +110,54 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('user', UserController::class);
 
-    // Route::get('/subitem/store', [SubItemController::class, 'store'])->name('subitem.store');
-    Route::post('/subitem/store', [SubItemController::class, 'store'])->name('subitem.store');
 
+    // Route::get('/subitem/store', [SubItemController::class, 'store'])->name('subitem.store');
+    // Route::post('/subtask/store', [SubTaskController::class, 'store'])->name('subtask.store');
+
+
+
+    // ------------------------------ new routes for Sub tasks ------------------------------- \\
+
+    Route::post('/subtask/store', [SubTaskController::class, 'store'])->name('subtask.store');
+    Route::get('/subtask/show', [SubTaskController::class, 'show'])->name('subtask.show');
+    Route::put('/subtask/{id}/update', [SubTaskController::class, 'update'])->name('subtask.update');
+    Route::delete('/subtask/{id}/delete', [SubTaskController::class, 'destroy'])->name('subtask.delete');
+    Route::post('/subtask/comment/store', [SubTaskController::class, 'storeComment'])->name('subtask.storeComment');
+    Route::delete('/subtask/comment/{id}/delete', [SubTaskController::class, 'destroyComment'])->name('subtask.deleteComment');
+    Route::delete('/replies/{id}', [SubTaskController::class, 'destroyReply'])->name('reply.destroy');
+    Route::get('/subtask-details/{id}', [SubTaskController::class, 'details'])->name('subtask.details');
+    Route::post('/subtask/store-reply', [SubTaskController::class, 'storeReply'])->name('subtask.storeReply');
+    Route::get('/user-suggestions', [SubTaskController::class, 'getSuggestions'])->name('user.suggestions');
+
+    // ------------------------------ new routes for Sub tasks ------------------------------- \\
+
+
+    Route::get('/one-to-one-chat', [MessagesController::class, 'index'])->name('one-to-one.index');
+    Route::post('/one-to-one-chat/send', [MessagesController::class, 'send'])->name('one-to-one.send');
+
+    
+Route::get('/groups', [GroupChatController::class, 'index'])->name('groups.index');
+
+Route::post('/groups', [GroupChatController::class, 'createGroup'])->name('groups.create');
+
+// Add Users to a Group
+Route::post('/groups/{group}/users', [GroupChatController::class, 'addUsersToGroup'])->name('groups.addUsers');
+
+// Send a Message to a Group
+Route::post('/groups/{group}/messages', [GroupChatController::class, 'sendGroupMessage'])->name('groups.sendMessage');
+Route::get('/groups/{group}', [GroupChatController::class, 'show'])->name('groups.show');
+// Fetch Messages for a Group
+Route::get('/groups/{group}/messages', [GroupChatController::class, 'fetchGroupMessages'])->name('groups.fetchMessages');
+Route::delete('/groups/{group}/messages/{message}', [GroupChatController::class, 'deleteGroupMessage'])->name('groups.messages.delete');
+    Route::post('/mark-as-read', [MessagesController::class, 'markAsRead'])->name('chat.markAsRead');
+    Route::get('search', [MessagesController::class, 'search'])->name('user.search');
+    Route::post('/group/create', [MessagesController::class, 'createGroup'])->name('group.create');
+    Route::delete('/message/{id}/delete', [MessagesController::class, 'delete'])->name('message.delete');
+    Route::post('/group/{group}/add-users', [MessagesController::class, 'addUsers'])->name('group.addUsers');
+Route::delete('/group/{group}/remove-user/{user}', [MessagesController::class, 'removeUser'])->name('group.removeUser');
 
 });
+
 
 Route::post('/save-editor-data', function (Request $request) {
     $content = $request->input('content');
