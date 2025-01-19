@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
 use App\Models\Subtask;
+use App\Models\Task;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -78,9 +79,11 @@ class ProjectController extends Controller
     public function show($id)
     {
         $subtask=Subtask::where('task_id',$id)->get();
-        $project = Project::with('users', 'invites', 'boards', 'boards.tasks')->findOrFail($id);
+        $task = Task::where('board_id', $id)->get();
+        $project = Project::with('users', 'invites', 'boards', 'boards.tasks.subtasks')->findOrFail($id);
+
         // return view('projectDetails', compact('project','subtask'));
-        return view('projectDetails', compact('project','subtask'));
+        return view('projectDetails', compact('project','subtask','task'));
 
 
 
