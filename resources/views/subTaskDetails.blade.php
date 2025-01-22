@@ -85,8 +85,8 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('project.show', $project->id) }}">{{ $project->name }}</a>
                     </li>
-                    <li class="breadcrumb-item"><a href="javascript:void(0)">{{ $task->board->name }}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $task->title }}</li>
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">{{ $subtask->board->name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $subtask->title }}</li>
                 </ol>
             </nav>
             {{-- End Project Detials --}}
@@ -109,7 +109,7 @@
                                 <hr class="dropdown-divider" />
                             </li>
                             <li>
-                                <form action="{{ route('task.delete', $task->id) }}" method="POST">
+                                <form action="{{ route('subtask.delete', $task->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
 
@@ -556,7 +556,7 @@
                     <div class="card-body">
                         <div class="list-group" bis_skin_checked="1">
                             @forelse ($task->board->tasks as $t)
-                                <a href="{{ route('task.show', ['id' => $t->id]) }}"
+                                <a href="{{ route('subtask.show', ['id' => $t->id]) }}"
                                     class="list-group-item list-group-item-action d-flex justify-content-between">
                                     <div class="li-wrapper d-flex justify-content-start align-items-center"
                                         bis_skin_checked="1">
