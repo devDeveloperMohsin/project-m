@@ -41,8 +41,7 @@
                         @csrf
                         <button type="submit" class="btn btn-icon btn-sm btn-simple ms-2">
                             <span
-                                class="tf-icons bx bxs-star {{ in_array($project->id, $markedProjects->pluck('id')->toArray()) ? 'text-warning' : '' }}">
-                            </span>
+                                class="tf-icons bx bxs-star {{ in_array($project->id, $markedProjects->pluck('id')->toArray()) ? 'text-warning' : '' }}"></span>
                         </button>
                     </form>
                 </div>
@@ -232,514 +231,110 @@
                         <div class="p-group-body mb-5">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-hover table-bordered table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <td>Title</td>
-                                                    <td>Status</td>
-                                                    <td>Priority</td>
-                                                    <td>Due Date</td>
-                                                    <td>Type</td>
-                                                    <td>Assigned to</td>
-                                                    {{-- <td>Created at</td> --}}
-                                                    {{-- <td>Last Updated</td> --}}
-                                                    <td>Actions</td>
-                                                    <td>Subtask</td>
-                                                    <td>Details</td>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($board->tasks as $task)
-                                                    <tr id="task-{{ $task->id }}">
-                                                        <td>
-                                                            @if ($task->subtasks->count() > 0)
-                                                                <button class="btn btn-link toggle-subtasks"
-                                                                    data-task-id="{{ $task->id }}">
-                                                                    <i class="bx bx-plus-circle"></i>
-                                                                </button>
+                                    <table class="table table-striped table-hover table-bordered table-sm">
+                                        <thead>
+                                            <tr>
+                                                <td>Title</td>
+                                                <td>Status</td>
+                                                <td>Priority</td>
+                                                <td>Due Date</td>
+                                                <td>Type</td>
+                                                <td>Assigned to</td>
+                                                <td>Created at</td>
+                                                <td>Last Updated</td>
+                                                <td>Actions</td>
+                                                <td>Subtask</td>
+                                                <td>Details</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($board->tasks as $task)
+                                                <tr id="task-{{ $task->id }}">
+                                                    <td>
+                                                        {{ $task->title }}
+                                                        @if ($task->subItems->count() > 0)
+                                                            <button class="btn btn-link toggle-subtasks"
+                                                                data-task-id="{{ $task->id }}">
+                                                                <i class="bx bx-plus-circle"></i>
+                                                            </button>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $task->status }}</td>
+                                                    <td>{{ $task->priority }}</td>
+                                                    <td>{{ $task->due_date->format('d/M/Y') }}</td>
+                                                    <td>{{ $task->type }}</td>
+                                                    <td>
+                                                        @foreach ($task->users as $user)
+                                                            <div class="avatar avatar-sm me-2">
+                                                                <img src="{{ !empty($user->getFirstMediaUrl()) ? $user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
+                                                                     alt="user-avatar" class="d-block rounded-circle" style="object-fit: cover" height="30" width="30" />
+                                                            </div>
+                                                            <!-- {{ $user->name }} -->
+                                                            @if (!$loop->last)
+                                                                ,
                                                             @endif
-                                                            {{ $task->title }}
-                                                            
-                                                        </td>
-                                                        <td>{{ $task->status }}</td>
-                                                        <td>{{ $task->priority }}</td>
-                                                        <td>{{ $task->due_date->format('d/M/Y') }}</td>
-                                                        <td>{{ $task->type }}</td>
-                                                        <td>
-                                                            @foreach ($task->users as $user)
-                                                                <div class="avatar avatar-sm me-2">
-                                                                    <img src="{{ !empty($user->getFirstMediaUrl()) ? $user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
-                                                                        alt="user-avatar" class="d-block rounded-circle"
-                                                                        style="object-fit: cover " height="30"
-                                                                        width="30">
-
-                                                                </div>
-                                                                <!-- {{ $user->name }} -->
-                                                                @if (!$loop->last)
-                                                                    ,
-                                                                @endif
-                                                            @endforeach
-                                                        </td>
-
-                                                        {{--  Add Task Button ----------- --}}
-
-                                                        {{-- <td>{{ $task->assigned_to ?? 'Unassigned' }}</td> --}}
-                                                        {{-- <td>{{ $task->created_at->format('d/M/Y') }}</td> --}}
-                                                        <td>{{ $task->updated_at->diffForHumans() }}</td>
-                                                        <td>
-                                                            {{-- <button type="button" class="btn btn-light"
+                                                        @endforeach
+                                                    </td>
+                                                    <td>{{ $task->assigned_to ?? 'Unassigned' }}</td>
+                                                    <td>{{ $task->created_at->format('d/M/Y') }}</td>
+                                                    <td>{{ $task->updated_at->diffForHumans() }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-primary"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#addRoleModal-{{ $task->id }}"> --}}
+                                                            data-bs-target="#addRoleModal-{{ $task->id }}">
+                                                            Add
+                                                        </button>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ route('task.show', ['id' => $task->id]) }}"
+                                                            class="btn btn-primary">show</a>
+                                                    </td>
+                                                </tr>
 
-                                                            <div data-bs-toggle="modal"
-                                                                data-bs-target="#addRoleModal-{{ $task->id }}"
-                                                                style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                                                                <button>
-                                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                                <lord-icon src="https://cdn.lordicon.com/mfdeeuho.json"
-                                                                    trigger="hover" stroke="bold" state="hover-swirl"
-                                                                    style="width:30px;height:30px ">
-                                                                </lord-icon>
-                                                                </button>
-
-                                                            </div>
-                                                            {{-- </button> --}}
-                                                            <div class="modal fade" id="addRoleModal-{{ $task->id }}" tabindex="-1"
-                                                                aria-labelledby="addRoleModalLabel-{{ $task->id }}" aria-hidden="true">
-                                                                <div class="modal-dialog">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title" id="addRoleModalLabel-{{ $task->id }}">Add Subtask</h5>
-                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                        </div>
-                                                                        <div class="modal-body">
-                                                                            <form action="{{ route('subtask.store') }}" method="POST">
-                                                                                @csrf
-                                                                                <input type="hidden" name="task_id" value="{{ $task->id }}">
-                                                                                <div class="modal-body">
-                                                                                    <div class="row">
-                                                                                        <div class="col mb-3">
-                                                                                            <label for="task-title" class="form-label">Title</label>
-                                                                                            <input type="text" id="task-title"
-                                                                                                class="form-control @error('title', 'task') is-invalid @enderror"
-                                                                                                placeholder="Write a Subtask title" name="title"
-                                                                                                value="{{ old('title') }}" />
-                                                                                            @error('title', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row">
-                                                                                        <div class="col mb-3">
-                                                                                            <label class="form-label">Description</label>
-                                                                                            <textarea id="editor1" name="description">{{ old('description') }}</textarea>
-                                                                                            @error('description', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row g-2">
-                                                                                        <div class="col mb-3">
-                                                                                            <label for="status-select" class="form-label">Select
-                                                                                                Status</label>
-                                                                                            <select class="form-select @error('status', 'task') is-invalid @enderror"
-                                                                                                id="status-select" aria-label="select task status" name="status">
-                                                                                                @foreach ($taskStatuses as $status)
-                                                                                                    <option value="{{ $status }}" class="text-capitalize">
-                                                                                                        {{ $status }}
-                                                                                                    </option>
-                                                                                                @endforeach
-                                                                                            </select>
-                                                                                            @error('status', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                        <div class="col mb-3">
-                                                                                            <label for="priority-select" class="form-label">Select
-                                                                                                Priority</label>
-                                                                                            <select class="form-select @error('priority', 'task') is-invalid @enderror"
-                                                                                                id="priority-select" aria-label="select task priority" name="priority">
-                                                                                                @foreach ($taskPriorities as $priority)
-                                                                                                    <option value="{{ $priority }}" class="text-capitalize">
-                                                                                                        {{ $priority }}
-                                                                                                    </option>
-                                                                                                @endforeach
-                                                                                            </select>
-                                                                                            @error('priority', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row g-2">
-                                                                                        <div class="col mb-3">
-                                                                                            <label for="task-type" class="form-label">Task
-                                                                                                Type</label>
-                                                                                            <select class="form-select @error('type', 'task') is-invalid @enderror"
-                                                                                                id="task-type" aria-label="select task type" name="type">
-                                                                                                @foreach ($taskTypes as $type)
-                                                                                                    <option value="{{ $type }}">
-                                                                                                        {{ $type }}
-                                                                                                    </option>
-                                                                                                @endforeach
-                                                                                            </select>
-                                                                                            @error('type', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                        <div class="col mb-3">
-                                                                                            <label for="due-date" class="form-label">Due Date</label>
-                                                                                            <input class="form-control @error('due_date', 'task') is-invalid @enderror"
-                                                                                                type="date" value="{{ old('due_date') }}" id="due-date"
-                                                                                                name="due_date" />
-                                                                                            @error('due_date', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row">
-                                                                                        <div class="col mb-3">
-                                                                                            <label for="assigned-to" class="form-label">Assigned
-                                                                                                To</label>
-                                                                                            <select class="form-select @error('task_user', 'task') is-invalid @enderror"
-                                                                                                id="assigned-to" aria-label="assign task" name="assigned_to">
-                                                                                                @foreach ($project->users as $user)
-                                                                                                    <option value="{{ $user->id }}">
-                                                                                                        {{ $user->name }}
-                                                                                                    </option>
-                                                                                                @endforeach
-                                                                                            </select>
-                                                                                            @error('task_user', 'task')
-                                                                                                <div class="form-text text-danger">
-                                                                                                    {{ $message }}
-                                                                                                </div>
-                                                                                            @enderror
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="modal-footer">
-                                                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                                        Close
-                                                                                    </button>
-                                                                                    <button type="submit" class="btn btn-primary">Save
-                                                                                        changes</button>
-                                                                                </div>
-                                                                            </form>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            {{--  Add Task Button ----------- --}}
-
-                                                        </td>
-                                                        <td>
-                                                            <div
-                                                                style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                                                                <a href="{{ route('task.show', ['id' => $task->id]) }}">
-                                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                                    <lord-icon src="https://cdn.lordicon.com/wepoiyzv.json"
-                                                                        trigger="hover" stroke="bold"
-                                                                        style="width:30px;height:30px">
-                                                                    </lord-icon>
-                                                                </a>
-                                                            </div>
+                                                {{-- Subtasks Row (Hidden by Default) --}}
+                                                @if ($task->subItems->count() > 0)
+                                                    <tr class="subtasks-row d-none" data-task-id="{{ $task->id }}">
+                                                        <td colspan="10">
+                                                            <table
+                                                                class="table table-striped table-bordered table-sm bg-dark text-light">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td>Title</td>
+                                                                        <td>Status</td>
+                                                                        <td>Priority</td>
+                                                                        <td>Due Date</td>
+                                                                        <td>Type</td>
+                                                                        <td>Assigned to</td>
+                                                                        <td>Created at</td>
+                                                                        <td>Last Updated</td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach ($task->subItems as $subItem)
+                                                                        <tr>
+                                                                            <td>{{ $subItem->title }}</td>
+                                                                            <td>{{ $subItem->status }}</td>
+                                                                            <td>{{ $subItem->priority }}</td>
+                                                                            <td>{{ \Carbon\Carbon::parse($subItem->due_date)->format('d/M/Y') }}
+                                                                            </td>
+                                                                            <td>{{ $subItem->type }}</td>
+                                                                            <td>{{ $subItem->assigned_to ?? 'Unassigned' }}
+                                                                            </td>
+                                                                            <td>{{ \Carbon\Carbon::parse($subItem->created_at)->format('d/M/Y H:i') }}
+                                                                            </td>
+                                                                            <td>{{ \Carbon\Carbon::parse($subItem->updated_at)->diffForHumans() }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
                                                         </td>
                                                     </tr>
 
-                                                    {{-- Subtasks Row (Hidden by Default) --}}
-                                                    @if ($task->subtasks->count() > 0)
-                                                        <tr class="subtasks-row d-none"
-                                                            data-task-id="{{ $task->id }}">
-                                                            <td colspan="10">
-
-                                                                <table
-                                                                    class="table table-striped table-bordered table-sm bg-dark text-light">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <td>Title</td>
-                                                                            <td>Status</td>
-                                                                            <td>Priority</td>
-                                                                            <td>Due Date</td>
-                                                                            <td>Type</td>
-                                                                            <td>Assigned to</td>
-                                                                            {{-- <td>Created at</td> --}}
-                                                                            <td>Last Updated</td>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @foreach ($task->subtasks as $subtask)
-                                                                            <tr>
-                                                                                <td>{{ $subtask->title }}</td>
-                                                                                <td>{{ $subtask->status }}</td>
-                                                                                <td>{{ $subtask->priority }}</td>
-                                                                                <td>{{ \Carbon\Carbon::parse($subtask->due_date)->format('d/M/Y') }}
-                                                                                </td>
-                                                                                <td>{{ $subtask->type }}</td>
-                                                                            </td>
-                                                                                <td>@foreach ($subtask->users as $user)
-                                                                                    <div class="avatar avatar-sm me-2">
-                                                                                        <img src="{{ !empty($user->getFirstMediaUrl()) ? $user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
-                                                                                            alt="user-avatar" class="d-block rounded-circle"
-                                                                                            style="object-fit: cover " height="30"
-                                                                                            width="30">
-                    
-                                                                                    </div>
-                                                                                    <!-- {{ $user->name }} -->
-                                                                                    @if (!$loop->last)
-                                                                                        ,
-                                                                                    @endif
-                                                                                @endforeach
-                                                                                </td>
-                                                                                
-                                                                                <td>{{ \Carbon\Carbon::parse($subtask->updated_at)->diffForHumans() }}
-                                                                                </td>
-                                                                                <td>
-                                                                                    <div data-bs-toggle="modal"
-                                                                                        data-bs-target="#showsubtask-{{ $subtask->id }}"
-                                                                                        style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                                                                                        <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                                                        <lord-icon
-                                                                                            src="https://cdn.lordicon.com/wepoiyzv.json"
-                                                                                            trigger="hover" stroke="bold"
-                                                                                            style="width:30px;height:30px">
-                                                                                        </lord-icon>
-                                                                                    </div>
-                                                                                    <div class="modal fade" id="showsubtask-{{ $subtask->id }}" tabindex="-1"
-                                                                                        aria-labelledby="showsubtaskLabel-{{ $subtask->id }}" aria-hidden="true">
-                                                                                        <div class="modal-dialog">
-                                                                                            <div class="modal-content">
-                                                                                                <div class="modal-header">
-                                                                                                    <h5 class="modal-title" id="addRoleModalLabel-{{ $subtask->id }}">Subtask Details</h5>
-                                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                                                </div>
-                                                                                                <div class="modal-body">
-                                                                                                    <div class="card-body">
-                                                                                                        <div class="row">
-                                                                                                            <!-- Left Section -->
-                                                                                                            <div class="col-md-8 col-lg-7">
-                                                                                                                <div class="row">
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label for="subtask-title" class="form-label">Title</label>
-                                                                                                                        <p>{{ $subtask->title }}</p>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                                <div class="row">
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label class="form-label">Description</label>
-                                                                                                                        <div>{!! $subtask->description !!}</div>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                            <!-- Right Section -->
-                                                                                                            <div class="col-md-4 col-lg-5">
-                                                                                                                <div class="row g-2">
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label for="subtask-status" class="form-label">Status</label>
-                                                                                                                        <p>{{ $subtask->status }}</p>
-                                                                                                                    </div>
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label for="subtask-priority" class="form-label">Priority</label>
-                                                                                                                        <p>{{ $subtask->priority }}</p>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                                <div class="row g-2">
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label for="subtask-type" class="form-label">Type</label>
-                                                                                                                        <p>{{ $subtask->type }}</p>
-                                                                                                                    </div>
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label for="subtask-due-date" class="form-label">Due Date</label>
-                                                                                                                        <p>{{ \Carbon\Carbon::parse($subtask->due_date)->format('d/M/Y') }}</p>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                                <div class="row">
-                                                                                                                    <div class="col mb-3">
-                                                                                                                        <label for="subtask-assigned-to" class="form-label">Assigned To</label>
-                                                                                                                        <div class="d-flex align-items-center">
-                                                                                                                            @foreach ($subtask->users as $user)
-                                                                                                                                <div class="avatar avatar-sm me-2">
-                                                                                                                                    <img src="{{ !empty($user->getFirstMediaUrl()) ? $user->getFirstMediaUrl('default', 'preview') : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
-                                                                                                                                        alt="user-avatar" class="d-block rounded-circle"
-                                                                                                                                        style="object-fit: cover " height="30" width="30">
-                                                                                                                                </div>
-                                                                                                                                <p class="mb-0">{{ $user->name }}</p>
-                                                                                                                                @if (!$loop->last)
-                                                                                                                                    <span>, </span>
-                                                                                                                                @endif
-                                                                                                                            @endforeach
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="modal fade" id="editSubtaskModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-                                                                                        <div class="modal-dialog modal-lg" role="document">
-                                                                                            <div class="modal-content">
-                                                                                                <div class="modal-header">
-                                                                                                    <h5 class="modal-title">Edit Subtask</h5>
-                                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                                                </div>
-                                                                                    
-                                                                                                <form action="{{ route('subtask.update', $subtask->id) }}" method="POST">
-                                                                                                    @csrf
-                                                                                                    @method('PUT')
-                                                                                                    <div class="modal-body">
-                                                                                                        <div class="row">
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label for="subtask-title" class="form-label">Title</label>
-                                                                                                                <input type="text" id="subtask-title"
-                                                                                                                    class="form-control @error('title', 'subtask') is-invalid @enderror"
-                                                                                                                    placeholder="Write a subtask title" name="title"
-                                                                                                                    value="{{ old('title', $subtask->title) }}" />
-                                                                                                                @error('title', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <div class="row">
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label class="form-label">Description</label>
-                                                                                                                <textarea id="editor3" name="description">{{ old('description', $subtask->description) }}</textarea>
-                                                                                                                @error('description', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <div class="row g-2">
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label for="status-select" class="form-label">Select Status</label>
-                                                                                                                <select class="form-select @error('status', 'subtask') is-invalid @enderror"
-                                                                                                                    id="status-select" aria-label="select subtask status" name="status">
-                                                                                                                    @foreach ($taskStatuses as $status)
-                                                                                                                        <option value="{{ $status }}" class="text-capitalize"
-                                                                                                                            @selected($subtask->status == $status)>
-                                                                                                                            {{ $status }}</option>
-                                                                                                                    @endforeach
-                                                                                                                </select>
-                                                                                                                @error('status', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label for="priority-select" class="form-label">Select Priority</label>
-                                                                                                                <select class="form-select @error('priority', 'subtask') is-invalid @enderror"
-                                                                                                                    id="priority-select" aria-label="select subtask priority" name="priority">
-                                                                                                                    @foreach ($taskPriorities as $priority)
-                                                                                                                        <option value="{{ $priority }}" class="text-capitalize"
-                                                                                                                            @selected($subtask->priority == $priority)>
-                                                                                                                            {{ $priority }}</option>
-                                                                                                                    @endforeach
-                                                                                                                </select>
-                                                                                                                @error('priority', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <div class="row g-2">
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label for="subtask-type" class="form-label">Subtask Type</label>
-                                                                                                                <select class="form-select @error('type', 'subtask') is-invalid @enderror" id="subtask-type"
-                                                                                                                    aria-label="select subtask type" name="type">
-                                                                                                                    @foreach ($taskTypes as $type)
-                                                                                                                        <option value="{{ $type }}" @selected($subtask->type == $type)>
-                                                                                                                            {{ $type }}</option>
-                                                                                                                    @endforeach
-                                                                                                                </select>
-                                                                                                                @error('type', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label for="due-date" class="form-label">Due Date</label>
-                                                                                                                <input class="form-control @error('due_date', 'subtask') is-invalid @enderror"
-                                                                                                                    type="date" 
-                                                                                                                    value="{{ old('due_date', optional($subtask->due_date)->format('Y-m-d')) }}"
-                                                                                                                    name="due_date" />
-                                                                                    
-                                                                                                                @error('due_date', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <div class="row">
-                                                                                                            <div class="col mb-3">
-                                                                                                                <label for="assigned-to" class="form-label">Assigned To</label>
-                                                                                                                <select class="form-select @error('subtask_user', 'subtask') is-invalid @enderror"
-                                                                                                                    id="assigned-to" aria-label="assign subtask" name="assigned_to">
-                                                                                                                    @foreach ($subtask->users as $user)
-                                                                                                                        <option value="{{ $user->id }}" @selected($subtask->assigned_to == $user->id)>{{ $user->name }}</option>
-                                                                                                                    @endforeach
-                                                                                                                </select>
-                                                                                                                @error('subtask_user', 'subtask')
-                                                                                                                    <div class="form-text text-danger">
-                                                                                                                        {{ $message }}
-                                                                                                                    </div>
-                                                                                                                @enderror
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <div class="modal-footer">
-                                                                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                                                                                            Close
-                                                                                                        </button>
-                                                                                                        <button type="submit" class="btn btn-primary">Save changes</button>
-                                                                                                    </div>
-                                                                                                </form>
-                                                                                    
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </td>
-                                                                                <td>
-                                                                                    <button type="button" style="border:none; background:none;" data-bs-toggle="modal" data-bs-target="#editSubtaskModal">
-                                                                                        <lord-icon
-                                                                                        src="https://cdn.lordicon.com/vysppwvq.json"
-                                                                                        trigger="hover"
-                                                                                        style="width:30px;height:30px">
-                                                                                    </lord-icon>
-                                                                                    </button>
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                                    </tbody>
-                                                                </table>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -987,8 +582,8 @@
                             <div class="row g-2">
                                 <div class="col mb-3">
                                     <label for="task-type" class="form-label">Task Type</label>
-                                    <select class="form-select @error('type', 'task') is-invalid @enderror" id="task-type"
-                                        aria-label="select task type" name="type">
+                                    <select class="form-select @error('type', 'task') is-invalid @enderror"
+                                        id="task-type" aria-label="select task type" name="type">
                                         @foreach ($taskTypes as $type)
                                             <option value="{{ $type }}">{{ $type }}</option>
                                         @endforeach
@@ -1041,16 +636,142 @@
         {{-- End Create Task Modal --}}
 
 
-        
-
-
-
-        <!-- Subtask Detail Modal -->
-        
-
-        <!-- Subtask Detail Card Body -->
-
-
+        <div class="modal fade" id="addRoleModal-{{ $task->id }}" tabindex="-1"
+            aria-labelledby="addRoleModalLabel-{{ $task->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addRoleModalLabel-{{ $task->id }}">Add Role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('subitem.store') }}" method="POST">
+                            @csrf
+                            <input type="text" name="task_id" value="{{ $task->id }}">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="task-title" class="form-label">Title</label>
+                                        <input type="text" id="task-title"
+                                            class="form-control @error('title', 'task') is-invalid @enderror"
+                                            placeholder="Write a task title" name="title"
+                                            value="{{ old('title') }}" />
+                                        @error('title', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea id="editor1" name="description">{{ old('description') }}</textarea>
+                                        @error('description', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col mb-3">
+                                        <label for="status-select" class="form-label">Select
+                                            Status</label>
+                                        <select class="form-select @error('status', 'task') is-invalid @enderror"
+                                            id="status-select" aria-label="select task status" name="status">
+                                            @foreach ($taskStatuses as $status)
+                                                <option value="{{ $status }}" class="text-capitalize">
+                                                    {{ $status }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('status', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                    <div class="col mb-3">
+                                        <label for="priority-select" class="form-label">Select
+                                            Priority</label>
+                                        <select class="form-select @error('priority', 'task') is-invalid @enderror"
+                                            id="priority-select" aria-label="select task priority" name="priority">
+                                            @foreach ($taskPriorities as $priority)
+                                                <option value="{{ $priority }}" class="text-capitalize">
+                                                    {{ $priority }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('priority', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col mb-3">
+                                        <label for="task-type" class="form-label">Task
+                                            Type</label>
+                                        <select class="form-select @error('type', 'task') is-invalid @enderror"
+                                            id="task-type" aria-label="select task type" name="type">
+                                            @foreach ($taskTypes as $type)
+                                                <option value="{{ $type }}">
+                                                    {{ $type }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('type', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                    <div class="col mb-3">
+                                        <label for="due-date" class="form-label">Due Date</label>
+                                        <input class="form-control @error('due_date', 'task') is-invalid @enderror"
+                                            type="date" value="{{ old('due_date') }}" id="due-date"
+                                            name="due_date" />
+                                        @error('due_date', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="assigned-to" class="form-label">Assigned
+                                            To</label>
+                                        <select class="form-select @error('task_user', 'task') is-invalid @enderror"
+                                            id="assigned-to" aria-label="assign task" name="assigned_to">
+                                            @foreach ($project->users as $user)
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('task_user', 'task')
+                                            <div class="form-text text-danger">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    Close
+                                </button>
+                                <button type="submit" class="btn btn-primary">Save
+                                    changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
 
@@ -1065,10 +786,6 @@
             </div>
         </div>
         {{-- End Edit Task Modal --}}
-        {{-- Edit subtask model --}}
-        <!-- Subtask Edit Modal -->
-
-        {{-- End subtask model --}}
 
         {{-- Create Board Modal --}}
         @if (Auth::user()->getProjectRole($project->id) === $project::ROLE_ADMIN)
@@ -1253,11 +970,6 @@
             });
         ClassicEditor
             .create(document.querySelector('#editor1'))
-            .catch(error => {
-                console.error(error);
-            });
-        ClassicEditor
-            .create(document.querySelector('#editor3'))
             .catch(error => {
                 console.error(error);
             });

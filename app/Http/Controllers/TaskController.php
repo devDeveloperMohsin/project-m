@@ -71,26 +71,15 @@ class TaskController extends Controller
 
     public function show(Request $request)
     {
-        // -------- for redirect for url taskshow --------------
-
-        $id = $request->query('id'); // Get 'id' from query string
-        $task = Task::find($id); // Replace with your model logic
-
-        if (!$task) {
-            abort(404, 'Task not found');
-        }
-        // -------- for redirect for url taskshow --------------
-
         $request->validate([
             'id' => ['required', 'integer', 'min:1'],
         ]);
 
-        $task = Task::with('subtasks','users', 'board.tasks', 'board.tasks.users', 'history', 'history.user')->findOrFail($request->get('id'));
+        $task = Task::with('subItems','users', 'board.tasks', 'board.tasks.users', 'history', 'history.user')->findOrFail($request->get('id'));
         $project = $task->board->project;
         $comments = TaskComment::with('user')->where('task_id', $task->id)->latest()->get();
         return view('taskDetails', compact('task', 'project', 'comments'));
     }
-
     public function storeComment(Request $request)
 {
     // Validate the input
@@ -235,17 +224,6 @@ class TaskController extends Controller
 }
 
 
-
-// ----- Redirect of task show URL ----------------
-
-
-// public function index()
-// {
-//     $tasks = Task::all(); // Fetch all tasks from the database
-//     return view('tasks.index', compact('tasks')); // Pass the tasks to the view
-// }
-
-// ----- Redirect of task show URL ----------------
 
 
 
